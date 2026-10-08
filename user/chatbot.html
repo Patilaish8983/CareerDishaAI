@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Counselor Chat | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .chat-container { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; height: 75vh; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        
+        .msg { max-width: 75%; padding: 0.85rem 1.25rem; border-radius: 14px; font-size: 0.92rem; }
+        .msg.bot { background-color: #27272a; color: #ffffff; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background-color: #facc15; color: #0f1115; align-self: flex-end; font-weight: 600; border-bottom-right-radius: 2px; }
+
+        .chat-input-area { padding: 1.25rem; border-top: 1px solid #27272a; display: flex; gap: 0.75rem; }
+        .chat-input { flex: 1; padding: 0.75rem 1rem; background-color: #09090b; border: 1px solid #27272a; border-radius: 10px; color: #ffffff; outline: none; }
+        .send-btn { background-color: #facc15; color: #0f1115; border: none; font-weight: 700; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg bot">
+                    Hello! I am your AI Career Disha Advisor. Ask me anything about choosing college streams, scholarship eligibility, or preparing for entrance exams!
+                </div>
+            </div>
+            <form class="chat-input-area" id="chat-form">
+                <input type="text" id="user-msg" class="chat-input" placeholder="Ask about careers, scholarships, or subject choices..." required>
+                <button type="submit" class="send-btn">Send</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('chatbot');
+
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('user-msg');
+            const messages = document.getElementById('chat-messages');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = input.value.trim();
+                if (!text) return;
+
+                // Render User Message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'msg user';
+                userMsg.textContent = text;
+                messages.appendChild(userMsg);
+
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+
+                // Simulate AI response
+                setTimeout(() => {
+                    const botMsg = document.createElement('div');
+                    botMsg.className = 'msg bot';
+                    botMsg.textContent = `Based on your profile, focusing on strong fundamentals in Mathematics and Computer Science will give you the best leverage for that pathway!`;
+                    messages.appendChild(botMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                }, 800);
+            });
+        });
+    </script>
+</body>
+</html>

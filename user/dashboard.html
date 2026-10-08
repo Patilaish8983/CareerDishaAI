@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+        .welcome-card { background: linear-gradient(135deg, #18181b 0%, #09090b 100%); border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .welcome-card h1 { font-size: 2rem; font-weight: 800; }
+        .welcome-card p { color: #a1a1aa; margin-top: 0.5rem; }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 1.5rem; }
+        .stat-card h4 { font-size: 0.85rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin: 0.5rem 0; }
+        .stat-card .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; background-color: rgba(250, 204, 21, 0.1); color: #facc15; }
+
+        .yellow-btn { background: linear-gradient(135deg, #facc15 0%, #eab308 100%); color: #0f1115; font-weight: 700; border: none; cursor: pointer; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; display: inline-block; transition: transform 0.2s; }
+        .yellow-btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <div class="welcome-card">
+            <div>
+                <h1>Welcome back, <span id="dash-user-name" class="yellow-text">Student</span> 👋</h1>
+                <p>Track your academic profile, take psychometric assessments, and generate your career roadmap.</p>
+            </div>
+            <a href="test.html" class="yellow-btn">Take Assessment</a>
+        </div>
+
+        <div class="grid-stats">
+            <div class="stat-card">
+                <h4>Academic Profile</h4>
+                <div class="value" id="dash-stream">Science (PCM)</div>
+                <span class="status-badge" id="dash-marks-status">5 Subjects Entered</span>
+            </div>
+            <div class="stat-card">
+                <h4>Psychometric Status</h4>
+                <div class="value" id="dash-test-status">Pending</div>
+                <span class="status-badge">15 Questions</span>
+            </div>
+            <div class="stat-card">
+                <h4>Top Matched Career</h4>
+                <div class="value" id="dash-career-match">AI Specialist</div>
+                <span class="status-badge">94% Match Score</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('dashboard');
+            const user = Storage.getUser();
+            const results = Storage.getResults();
+
+            document.getElementById('dash-user-name').textContent = user.name || 'Student';
+            document.getElementById('dash-stream').textContent = user.stream || 'Not Set';
+            
+            if (user.testCompleted) {
+                document.getElementById('dash-test-status').textContent = 'Completed';
+            }
+            if (results && results.topCareer) {
+                document.getElementById('dash-career-match').textContent = results.topCareer;
+            }
+        });
+    </script>
+</body>
+</html>

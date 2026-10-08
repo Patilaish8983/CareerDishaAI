@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Profile & Marks | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
+        .profile-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; }
+        .profile-card h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .profile-card p { color: #a1a1aa; margin-bottom: 2rem; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #e4e4e7; margin-bottom: 0.5rem; }
+        .form-control { width: 100%; padding: 0.75rem 1rem; background-color: #09090b; border: 1px solid #27272a; border-radius: 10px; color: #ffffff; font-size: 0.95rem; outline: none; }
+        .form-control:focus { border-color: #facc15; }
+        select.form-control option { background-color: #09090b; color: #ffffff; }
+
+        .marks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .yellow-btn { width: 100%; background: linear-gradient(135deg, #facc15 0%, #eab308 100%); color: #0f1115; font-weight: 700; border: none; cursor: pointer; padding: 0.85rem; border-radius: 10px; font-size: 1rem; margin-top: 1.5rem; transition: transform 0.2s; }
+        .yellow-btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <div class="profile-card">
+            <h2>Academic Profile & <span class="yellow-text">Marks Entry</span></h2>
+            <p>Input your current education level and subject scores to calculate career compatibility.</p>
+
+            <form id="profile-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="prof-name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Education Level</label>
+                    <select id="prof-level" class="form-control" onchange="updateStreamOptions()">
+                        <option value="School (8th-10th)">School (8th - 10th Standard)</option>
+                        <option value="High School (11th-12th)" selected>High School / Junior College (11th - 12th)</option>
+                        <option value="Undergraduate (UG)">Undergraduate Degree (BE / B.Tech / BCA / BBA / B.Com / B.Sc / BA)</option>
+                        <option value="Postgraduate (PG)">Postgraduate Degree (MCA / MBA / M.Tech / M.Sc / MA)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Stream / Degree Branch</label>
+                    <select id="prof-stream" class="form-control" required>
+                        <!-- Options populated dynamically based on education level -->
+                    </select>
+                </div>
+
+                <h3 style="font-size: 1.1rem; margin: 1.5rem 0 1rem 0;">Key Subject Scores (Out of 100)</h3>
+                
+                <div class="marks-grid">
+                    <div class="form-group">
+                        <label id="lbl-m1">Subject 1 (Math / Logic / Physics)</label>
+                        <input type="number" id="m1" class="form-control" min="0" max="100" value="88" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-m2">Subject 2 (Computers / Science / Mgmt)</label>
+                        <input type="number" id="m2" class="form-control" min="0" max="100" value="92" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-m3">Subject 3 (Chemistry / Accounts / Elective)</label>
+                        <input type="number" id="m3" class="form-control" min="0" max="100" value="81" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-m4">English / Communication</label>
+                        <input type="number" id="m4" class="form-control" min="0" max="100" value="95" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="yellow-btn">Save Profile & Take Psychometric Test</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        const streamMapping = {
+            "School (8th-10th)": [
+                "School - General (8th - 10th Standard)",
+                "School - Foundation Science & Mathematics"
+            ],
+            "High School (11th-12th)": [
+                "11th/12th - Science (PCM - Physics, Chemistry, Math)",
+                "11th/12th - Science (PCB - Physics, Chemistry, Biology)",
+                "11th/12th - Science (PCMB - Math & Biology)",
+                "11th/12th - Commerce",
+                "11th/12th - Commerce with IP / Applied Math",
+                "11th/12th - Arts / Humanities",
+                "11th/12th - Vocational / IT"
+            ],
+            "Undergraduate (UG)": [
+                "Computer Science & Engineering (CSE)",
+                "Artificial Intelligence & Machine Learning (AI & ML)",
+                "Information Technology (IT)",
+                "Electronics & Communication Engineering (ECE)",
+                "Mechanical Engineering",
+                "Civil Engineering",
+                "BCA (Bachelor of Computer Applications)",
+                "B.Sc Computer Science / IT",
+                "B.Sc Data Science & AI",
+                "B.Com (General / Honours / A&F)",
+                "BBA (Bachelor of Business Administration)",
+                "BMS (Bachelor of Management Studies)",
+                "BA Psychology / Economics / Media",
+                "Integrated Law (BA LLB / BBA LLB)",
+                "B.Pharm (Pharmacy)",
+                "MBBS / BDS / Allied Health",
+                "B.Des (UI-UX / Graphic / Product Design)",
+                "B.Arch (Architecture)"
+            ],
+            "Postgraduate (PG)": [
+                "MCA (Master of Computer Applications)",
+                "MBA (Marketing / Finance / HR / Operations)",
+                "MBA (Business Analytics / IT)",
+                "M.Tech (CSE / AI / ECE / Mechanical)",
+                "M.Sc Computer Science / IT / Physics",
+                "M.Com (Master of Commerce)",
+                "MA (Psychology / Economics / Literature)",
+                "LLM (Master of Laws)",
+                "M.Pharm / MD / MS"
+            ]
+        };
+
+        function updateStreamOptions() {
+            const levelSelect = document.getElementById('prof-level');
+            const streamSelect = document.getElementById('prof-stream');
+            const selectedLevel = levelSelect ? levelSelect.value : "High School (11th-12th)";
+
+            streamSelect.innerHTML = '<option value="" disabled selected>Select your Stream / Branch</option>';
+
+            const availableStreams = streamMapping[selectedLevel] || [];
+            availableStreams.forEach(stream => {
+                const option = document.createElement('option');
+                option.value = stream;
+                option.textContent = stream;
+                streamSelect.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('profile');
+            const user = Storage.getUser();
+
+            document.getElementById('prof-name').value = user.name || '';
+            if (user.academicLevel) {
+                document.getElementById('prof-level').value = user.academicLevel;
+            }
+            
+            updateStreamOptions();
+
+            if (user.stream) {
+                document.getElementById('prof-stream').value = user.stream;
+            }
+
+            document.getElementById('profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                user.name = document.getElementById('prof-name').value;
+                user.academicLevel = document.getElementById('prof-level').value;
+                user.stream = document.getElementById('prof-stream').value;
+                user.marks = {
+                    subject1: parseInt(document.getElementById('m1').value) || 0,
+                    subject2: parseInt(document.getElementById('m2').value) || 0,
+                    subject3: parseInt(document.getElementById('m3').value) || 0,
+                    subject4: parseInt(document.getElementById('m4').value) || 0,
+                };
+                Storage.setUser(user);
+                window.location.href = 'test.html';
+            });
+        });
+    </script>
+</body>
+</html>

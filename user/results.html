@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychometric Results | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+        .results-header { text-align: center; margin-bottom: 3rem; }
+        .results-header h1 { font-size: 2.5rem; font-weight: 800; }
+
+        .result-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; text-align: center; margin-bottom: 2rem; }
+        .match-badge { display: inline-block; background-color: rgba(250, 204, 21, 0.1); color: #facc15; font-size: 1.2rem; font-weight: 800; padding: 0.5rem 1.5rem; border-radius: 50px; margin-bottom: 1rem; }
+        
+        .yellow-btn { background: linear-gradient(135deg, #facc15 0%, #eab308 100%); color: #0f1115; font-weight: 700; border: none; cursor: pointer; padding: 0.85rem 2rem; border-radius: 10px; font-size: 1rem; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <div class="results-header">
+            <h1>Your Profile <span class="yellow-text">Analysis</span></h1>
+            <p>Based on your psychometric choices and academic foundation</p>
+        </div>
+
+        <div class="result-card">
+            <span class="match-badge" id="match-score">92% Compatibility</span>
+            <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;" id="primary-career">AI & Software Engineer</h2>
+            <p style="color: #a1a1aa; max-width: 600px; margin: 0 auto 2rem auto;" id="primary-desc">You show strong analytical problem-solving traits paired with high quantitative reasoning skills.</p>
+            <a href="careers.html" class="yellow-btn">View Detailed Roadmaps</a>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('results');
+            const res = Storage.getResults();
+            if (res) {
+                document.getElementById('primary-career').textContent = res.topCareer;
+                document.getElementById('match-score').textContent = `${res.matchScore}% Match Score`;
+            }
+        });
+    </script>
+</body>
+</html>

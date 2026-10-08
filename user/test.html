@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychometric Test | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
+        .quiz-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; }
+        .progress-bar { width: 100%; height: 8px; background-color: #27272a; border-radius: 4px; margin-bottom: 2rem; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #facc15; width: 0%; transition: width 0.3s ease; }
+
+        .question-title { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 1.5rem; }
+        .option-btn { width: 100%; text-align: left; background-color: #09090b; border: 1px solid #27272a; color: #e4e4e7; padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 0.85rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; font-family: inherit; }
+        .option-btn:hover { border-color: #facc15; background-color: rgba(250, 204, 21, 0.05); }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <div class="quiz-card">
+            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            <span style="font-size: 0.8rem; color: #facc15; font-weight: 700; text-transform: uppercase;">Question <span id="q-num">1</span> of <span id="q-total">5</span></span>
+            <div class="question-title" id="q-text">Loading question...</div>
+            <div id="options-container"></div>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        // Master Question Bank for all streams (School, High School, UG, PG)
+        const masterQuestions = [
+            {
+                q: "1. What type of activity excites you the most when learning or working on a project?",
+                options: [
+                    { text: "Building software, coding apps, or working with data & AI algorithms", tag: "Tech & Software" },
+                    { text: "Understanding human biology, diagnosing health issues, or medical care", tag: "Medical & Life Sciences" },
+                    { text: "Analyzing financial markets, managing business growth, or stock trading", tag: "Finance & Management" },
+                    { text: "Designing visual layouts, video editing, UI/UX, or writing creative content", tag: "Creative Arts & Design" },
+                    { text: "Debating legal rights, civil administration, sociology, or public policy", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "2. If given a free weekend workshop, which topic would you register for first?",
+                options: [
+                    { text: "Web Development & Machine Learning Bootcamp", tag: "Tech & Software" },
+                    { text: "First Aid, Clinical Physiology, & Modern Biotechnology", tag: "Medical & Life Sciences" },
+                    { text: "Startup Pitching, Digital Marketing & Stock Market Fundamentals", tag: "Finance & Management" },
+                    { text: "Graphic Design, Digital Illustration & Brand Storytelling", tag: "Creative Arts & Design" },
+                    { text: "Moot Court, Civil Service Strategy & Political Science Analysis", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "3. What kind of problem-solving approach suits your natural strengths best?",
+                options: [
+                    { text: "Logical debugging, mathematical formulas, and algorithmic reasoning", tag: "Tech & Software" },
+                    { text: "Scientific observation, biological research, and patient care empathy", tag: "Medical & Life Sciences" },
+                    { text: "Risk assessment, strategic planning, and financial decision-making", tag: "Finance & Management" },
+                    { text: "Visualizing aesthetic concepts, sketching, and artistic expression", tag: "Creative Arts & Design" },
+                    { text: "Analyzing documentation, persuasive argument, and social leadership", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "4. What is your preferred work or study environment?",
+                options: [
+                    { text: "Tech innovation hub, software studio, or data laboratory", tag: "Tech & Software" },
+                    { text: "Hospital, diagnostic research lab, or pharmaceutical center", tag: "Medical & Life Sciences" },
+                    { text: "Corporate office, investment bank, or managing your own business", tag: "Finance & Management" },
+                    { text: "Media agency, design studio, or freelance creative workspace", tag: "Creative Arts & Design" },
+                    { text: "Courtroom, government IAS/IPS office, or non-profit advocacy organization", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "5. What type of impact do you aspire to make in your career?",
+                options: [
+                    { text: "Inventing disruptive software technology, automation, or smart gadgets", tag: "Tech & Software" },
+                    { text: "Saving lives, advancing medical cures, or improving public healthcare", tag: "Medical & Life Sciences" },
+                    { text: "Creating profitable companies, generating jobs, and leading markets", tag: "Finance & Management" },
+                    { text: "Inspiring people through art, design, media, and storytelling", tag: "Creative Arts & Design" },
+                    { text: "Ensuring social justice, enacting fair laws, and governance leadership", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "6. Which school or college subject did/do you find most engaging?",
+                options: [
+                    { text: "Computer Science / Information Technology / Mathematics", tag: "Tech & Software" },
+                    { text: "Biology / Physiology / Chemistry", tag: "Medical & Life Sciences" },
+                    { text: "Economics / Accountancy / Business Studies", tag: "Finance & Management" },
+                    { text: "Fine Arts / Graphic Design / Mass Communication", tag: "Creative Arts & Design" },
+                    { text: "Political Science / History / Legal Studies / Sociology", tag: "Law & Civil Services" }
+                ]
+            },
+            {
+                q: "7. When working in a team project, what role do you naturally fall into?",
+                options: [
+                    { text: "The technical builder who codes or constructs the core solution", tag: "Tech & Software" },
+                    { text: "The detail-oriented researcher checking scientific facts and health safety", tag: "Medical & Life Sciences" },
+                    { text: "The team lead managing deadlines, budgets, and client presentations", tag: "Finance & Management" },
+                    { text: "The creative vision creator designing slides, graphics, and visuals", tag: "Creative Arts & Design" },
+                    { text: "The communicator drafting arguments, policies, and handling legal terms", tag: "Law & Civil Services" }
+                ]
+            }
+        ];
+
+        let selectedQuestions = [];
+        let currentQ = 0;
+        let scores = {
+            "Tech & Software": 0,
+            "Medical & Life Sciences": 0,
+            "Finance & Management": 0,
+            "Creative Arts & Design": 0,
+            "Law & Civil Services": 0
+        };
+
+        // Function to shuffle array randomly
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('test');
+            
+            // Randomly select 5 questions out of the 7 master questions
+            selectedQuestions = shuffle([...masterQuestions]).slice(0, 5);
+            document.getElementById('q-total').textContent = selectedQuestions.length;
+            
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            const q = selectedQuestions[currentQ];
+            document.getElementById('q-num').textContent = currentQ + 1;
+            document.getElementById('q-text').textContent = q.q;
+            document.getElementById('progress').style.width = `${((currentQ + 1) / selectedQuestions.length) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            // Shuffle options for each question so choice order is also dynamic
+            const shuffledOptions = shuffle([...q.options]);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt.text;
+                btn.onclick = () => selectOption(opt.tag);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(tag) {
+            if (scores.hasOwnProperty(tag)) {
+                scores[tag]++;
+            }
+            currentQ++;
+            if (currentQ < selectedQuestions.length) {
+                loadQuestion();
+            } else {
+                finishTest();
+            }
+        }
+
+        function finishTest() {
+            const user = Storage.getUser();
+            user.testCompleted = true;
+            Storage.setUser(user);
+
+            // Determine highest scoring domain
+            let topDomain = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            
+            const domainCareerMapping = {
+                "Tech & Software": {
+                    topCareer: "Software & AI Engineer / Data Specialist",
+                    desc: "You demonstrate high logical reasoning, algorithmic problem-solving, and interest in technology systems."
+                },
+                "Medical & Life Sciences": {
+                    topCareer: "Medical Professional / Biotechnologist / Healthcare Lead",
+                    desc: "You possess high scientific curiosity, empathy, and strong affinity for biological and clinical research."
+                },
+                "Finance & Management": {
+                    topCareer: "Business Strategy / Investment Banking / Entrepreneurship",
+                    desc: "You display natural leadership, commercial awareness, strategic planning, and financial decision-making skills."
+                },
+                "Creative Arts & Design": {
+                    topCareer: "UI/UX Product Designer / Creative Director / Content Strategist",
+                    desc: "You show strong creative expression, aesthetic visual design skills, and artistic problem-solving."
+                },
+                "Law & Civil Services": {
+                    topCareer: "Corporate Lawyer / Civil Servant (IAS/IPS) / Policy Analyst",
+                    desc: "You have strong analytical reasoning, interest in governance, public administration, and legal advocacy."
+                }
+            };
+
+            const matchResult = domainCareerMapping[topDomain] || domainCareerMapping["Tech & Software"];
+
+            let resultData = {
+                category: topDomain,
+                topCareer: matchResult.topCareer,
+                description: matchResult.desc,
+                matchScore: 92 + Math.floor(Math.random() * 6) // Random realistic match % (92-97%)
+            };
+
+            Storage.setResults(resultData);
+            window.location.href = 'results.html';
+        }
+    </script>
+</body>
+</html>

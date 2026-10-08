@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers & Roadmap | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        
+        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+
+        main { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+
+        /* Banner for Recruitment Eligibility Rules */
+        .placement-notice {
+            background-color: rgba(250, 204, 21, 0.08);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+        .placement-notice h3 { color: #facc15; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .placement-notice p { font-size: 0.92rem; color: #e4e4e7; line-height: 1.6; }
+        .placement-notice ul { margin-top: 0.75rem; padding-left: 1.25rem; font-size: 0.88rem; color: #a1a1aa; }
+        .placement-notice ul li { margin-bottom: 0.35rem; }
+
+        .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
+        .careers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem; }
+        
+        .career-card { 
+            background-color: #18181b; 
+            border: 1px solid #27272a; 
+            border-radius: 18px; 
+            padding: 1.75rem; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+        .career-card:hover { border-color: rgba(250, 204, 21, 0.4); transform: translateY(-3px); }
+        .career-card h3 { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; }
+        .career-card p { font-size: 0.88rem; color: #a1a1aa; margin-bottom: 1.25rem; }
+        
+        .card-tag { display: inline-block; background-color: #09090b; border: 1px solid #27272a; color: #a1a1aa; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 6px; margin-bottom: 0.75rem; }
+        .salary-badge { font-size: 0.9rem; color: #facc15; font-weight: 700; background-color: rgba(250, 204, 21, 0.1); padding: 0.4rem 0.85rem; border-radius: 8px; display: inline-block; }
+
+        /* Roadmap Section */
+        .roadmap-container { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; }
+        .roadmap-step { display: flex; gap: 1.5rem; margin-bottom: 1.75rem; }
+        .step-num { width: 40px; height: 40px; border-radius: 50%; background-color: #facc15; color: #0f1115; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; font-size: 1.1rem; }
+        .step-content h4 { font-size: 1.1rem; color: #ffffff; margin-bottom: 0.25rem; }
+        .step-content p { font-size: 0.88rem; color: #a1a1aa; }
+    </style>
+</head>
+<body>
+
+    <nav id="user-nav"></nav>
+
+    <main>
+        <!-- Corporate Campus Recruitment Eligibility Guidelines -->
+        <div class="placement-notice">
+            <h3>⚡ Critical Campus Placement Criteria (BE, B.Tech, BCA, MCA, BBA)</h3>
+            <p>To qualify for top product and service MNCs during campus hiring drives (e.g., TCS Digital, Infosys, LTIMindtree, Cognizant, Accenture, Wipro, and core engineering firms), maintain the following baseline academic records:</p>
+            <ul>
+                <li><strong>10th Standard:</strong> <strong>Above 90%</strong> recommended (Minimum 60%–70% mandatory across most companies).</li>
+                <li><strong>12th Standard / HSC:</strong> <strong>Above 85%</strong> recommended for top-tier packages.</li>
+                <li><strong>Diploma (Polytechnic):</strong> <strong>Above 85% aggregate</strong> required for direct second-year lateral entry students.</li>
+                <li><strong>Engineering / Degree CGPA:</strong> Maintain an aggregate CGPA of <strong>7.5+ to 8.5+</strong> with <strong>0 active backlogs</strong> at the time of campus drives.</li>
+            </ul>
+        </div>
+
+        <h2 class="section-title">Top High-Growth <span class="yellow-text">Career Pathways & Salary Insights (India)</span></h2>
+
+        <div class="careers-grid">
+            <!-- CS / IT / AI Domain -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Computer Science & IT</span>
+                    <h3>AI, ML & Full Stack Software Engineer</h3>
+                    <p>Build scalable web applications, machine learning pipelines, and cloud software. Highly demanded across tech startups and product firms.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹6,00,000 – ₹28,00,000 / year</div>
+            </div>
+
+            <!-- ENTC / ECE Domain -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Electronics & Telecommunication (ENTC/ECE)</span>
+                    <h3>VLSI Design & Embedded Systems Engineer</h3>
+                    <p>Design semiconductor chips, microcontrollers, IoT devices, and 5G communication systems for hardware tech companies.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹5,50,000 – ₹22,00,000 / year</div>
+            </div>
+
+            <!-- Mechanical Engineering -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Mechanical Engineering</span>
+                    <h3>Robotics, CAD Design & EV Systems Specialist</h3>
+                    <p>Work on Electric Vehicle (EV) powertrain systems, industrial automation, CAD modeling, and automotive manufacturing.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹4,50,000 – ₹16,00,000 / year</div>
+            </div>
+
+            <!-- Chemical Engineering -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Chemical & Process Engineering</span>
+                    <h3>Process Safety & Polymer Technology Specialist</h3>
+                    <p>Manage chemical plant operations, pharmaceutical synthesis, oil & gas refining, and sustainable green energy processes.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹4,80,000 – ₹15,00,000 / year</div>
+            </div>
+
+            <!-- Finance & Business / MBA -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Commerce & Business (BBA / B.Com / MBA)</span>
+                    <h3>Financial Analyst & Business Product Manager</h3>
+                    <p>Analyze equity markets, drive business growth strategies, manage product roadmaps, and oversee corporate operations.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹5,00,000 – ₹24,00,000 / year</div>
+            </div>
+
+            <!-- Creative & UI/UX -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Design & Creative Arts</span>
+                    <h3>UI/UX Product Designer & Brand Specialist</h3>
+                    <p>Create intuitive mobile app interfaces, web design systems, user research journeys, and digital media assets.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹4,20,000 – ₹18,00,000 / year</div>
+            </div>
+
+            <!-- Healthcare & Biotech -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Medical & Life Sciences</span>
+                    <h3>Biotech Researcher & Clinical Data Analyst</h3>
+                    <p>Analyze clinical trial data, biomedical equipment, pharmaceutical formulations, and healthcare informatics.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹4,00,000 – ₹15,00,000 / year</div>
+            </div>
+
+            <!-- Civil Services & Law -->
+            <div class="career-card">
+                <div>
+                    <span class="card-tag">Law & Civil Services</span>
+                    <h3>Corporate Lawyer / Civil Services (IAS/IPS)</h3>
+                    <p>Handle corporate legal contracts, intellectual property, or lead district governance and public administration via UPSC/State PSC.</p>
+                </div>
+                <div class="salary-badge">Salary Range: ₹6,00,000 – ₹20,00,000 / year</div>
+            </div>
+        </div>
+
+        <!-- Career Execution Roadmap -->
+        <div class="roadmap-container">
+            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Stage-by-Stage Career Roadmap</h3>
+
+            <div class="roadmap-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h4>School Level (8th - 10th Standard)</h4>
+                    <p>Build basic logical reasoning, math, and communication skills. Target <strong>above 90% in 10th board exams</strong> to keep all diploma and high school stream options open.</p>
+                </div>
+            </div>
+
+            <div class="roadmap-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h4>High School / Junior College / Diploma (11th - 12th / Polytechnic)</h4>
+                    <p>Focus on core stream subjects (PCM, PCB, or Commerce). Aim for <strong>above 85% in 12th or Diploma</strong> to qualify for top engineering (BE/B.Tech), medical, or management colleges.</p>
+                </div>
+            </div>
+
+            <div class="roadmap-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h4>Undergraduate Degree (BE / B.Tech / BCA / BBA / B.Com / B.Sc)</h4>
+                    <p>Maintain an aggregate <strong>CGPA of 8.0+ with zero active backlogs</strong>. Practice Data Structures & Algorithms (Java/Python) for CS/IT/ENTC, or core domain skills for Mechanical, Civil, and Chemical fields. Complete 1-2 real-world industry internships.</p>
+                </div>
+            </div>
+
+            <div class="roadmap-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h4>Placement Preparation & Higher Studies (Final Year / PG)</h4>
+                    <p>Prepare for aptitude tests, technical interview rounds, and HR interviews for campus recruitment drives. Alternatively, prepare for GATE, CAT, GRE, or MCA entrance exams.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserNavbar('careers');
+        });
+    </script>
+</body>
+</html>

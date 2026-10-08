@@ -1,0 +1,228 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Disha AI | Know Your Best Version</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1115; 
+            color: #f4f4f5;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+        .yellow-btn {
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+            color: #0f1115;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .yellow-btn:hover { transform: translateY(-2px); opacity: 0.95; }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(9, 9, 11, 0.9);
+            border-bottom: 1px solid #27272a;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: #facc15; }
+        
+        .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .login-link { color: #e4e4e7; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color 0.2s; }
+        .login-link:hover { color: #facc15; }
+        .nav-btn { padding: 0.6rem 1.2rem; border-radius: 10px; font-size: 0.85rem; text-decoration: none; }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        @media (min-width: 992px) { header { grid-template-columns: 1.2fr 0.8fr; } }
+        .hero-badge {
+            display: inline-block;
+            background-color: rgba(250, 204, 21, 0.1);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+            color: #facc15;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        h1 { font-size: 3.5rem; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero-desc { font-size: 1.15rem; color: #a1a1aa; margin-bottom: 2.5rem; max-width: 600px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .cta-primary { padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-size: 1rem; }
+        .cta-secondary { 
+            padding: 1rem 2rem; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-size: 1rem; 
+            border: 1px solid #3f3f46;
+            color: #e4e4e7;
+            background-color: rgba(24, 24, 27, 0.5);
+            transition: border 0.2s;
+        }
+        .cta-secondary:hover { border-color: #facc15; color: #ffffff; }
+
+        .showcase-container {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 0 50px rgba(250, 204, 21, 0.05);
+        }
+        .window-dots { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background-color: #3f3f46; }
+        .showcase-item {
+            background-color: #09090b;
+            border: 1px solid #27272a;
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .showcase-title { font-size: 0.95rem; font-weight: 600; color: #ffffff; }
+        .showcase-badge { background-color: rgba(250, 204, 21, 0.1); color: #facc15; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+
+        main { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+        .section-header { text-align: center; margin-bottom: 3.5rem; }
+        .section-header h2 { font-size: 2.25rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem; }
+        .section-header p { color: #a1a1aa; }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 768px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+        
+        .feature-card {
+            background-color: rgba(24, 24, 27, 0.5);
+            border: 1px solid #27272a;
+            border-radius: 18px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.3s;
+        }
+        .feature-card:hover { border-color: rgba(250, 204, 21, 0.4); }
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .feature-card h3 { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.75rem; }
+        .feature-card p { font-size: 0.9rem; color: #a1a1aa; margin-bottom: 1.5rem; }
+        .card-btn { width: 100%; padding: 0.85rem; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo-area">
+            <div class="logo-box bg-yellow">CD</div>
+            <span class="brand-name">Career Disha <span class="yellow-text">AI</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#counseling">Smart Counseling</a>
+            <a href="#scholarships">Scholarships</a>
+            <a href="#psychometric">Psychometric Tests</a>
+        </div>
+        <div class="nav-actions">
+            <!-- Dynamic parameters passed to indicate intent -->
+            <a href="auth.html?mode=login" class="login-link">Sign In</a>
+            <a href="auth.html?mode=signup" class="nav-btn yellow-btn">Create Account</a>
+        </div>
+    </nav>
+
+    <header>
+        <div>
+            <div class="hero-badge">⚡ Future Proof Your Career</div>
+            <h1>Know Your <span class="yellow-text">Best Version</span>.</h1>
+            <p class="hero-desc">Take full opportunity and excel. Don't let credentials restrict you—interact with our advanced AI tools, secure high-value scholarships, and discover curated pathways today.</p>
+            <div class="hero-actions">
+                <a href="#explore" class="cta-primary yellow-btn">Explore Free Tools First</a>
+                <a href="auth.html?mode=signup" class="cta-secondary">Learn From Smart Counseling</a>
+            </div>
+        </div>
+        
+        <div class="showcase-container">
+            <div class="window-dots">
+                <div class="dot" style="background-color: #ef4444;"></div>
+                <div class="dot" style="background-color: #eab308;"></div>
+                <div class="dot" style="background-color: #22c55e;"></div>
+            </div>
+            <div class="showcase-item">
+                <div>
+                    <div class="showcase-title">Scholarship Matches Found</div>
+                    <div style="font-size: 0.75rem; color: #71717a; margin-top: 0.2rem;">Based on live user criteria</div>
+                </div>
+                <span class="showcase-badge">24 Active</span>
+            </div>
+        </div>
+    </header>
+
+    <main id="explore">
+        <div class="section-header">
+            <h2>Interactive Modules Marketplace</h2>
+            <p>Click on any core dynamic element below to configure it. Choose your items prior to account registration.</p>
+        </div>
+
+        <div class="grid-container">
+            <div id="counseling" class="feature-card">
+                <div>
+                    <div class="card-icon bg-yellow">📋</div>
+                    <h3>Smart AI Counseling</h3>
+                    <p>Engage with an advisor system framework that analyzes your academic goals and plots career maps.</p>
+                </div>
+                <a href="auth.html?mode=signup" class="card-btn yellow-btn">Generate Roadmap</a>
+            </div>
+
+            <div id="scholarships" class="feature-card">
+                <div>
+                    <div class="card-icon bg-yellow">🎓</div>
+                    <h3>Scholarship Hub</h3>
+                    <p>Search through thousands of live government and private funds matching your specific skill set.</p>
+                </div>
+                <a href="auth.html?mode=signup" class="card-btn yellow-btn">Search Available Funds</a>
+            </div>
+
+            <div id="psychometric" class="feature-card">
+                <div>
+                    <div class="card-icon bg-yellow">🧠</div>
+                    <h3>Psychometric Profiling</h3>

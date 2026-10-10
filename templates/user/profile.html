@@ -94,7 +94,7 @@
         </div>
     </main>
 
-    <script src="user.js"></script>
+    <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
         const streamMapping = {
             "School (8th-10th)": [
@@ -173,6 +173,12 @@
             if (user.stream) {
                 document.getElementById('prof-stream').value = user.stream;
             }
+
+            document.addEventListener('DOMContentLoaded', () => {
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('profile');
+            }
+            });
 
             document.getElementById('profile-form').addEventListener('submit', (e) => {
                 e.preventDefault();

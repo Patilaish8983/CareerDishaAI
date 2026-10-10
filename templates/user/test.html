@@ -43,9 +43,12 @@
         </div>
     </main>
 
-    <script src="user.js"></script>
-    <script>
-        // Master Question Bank for all streams (School, High School, UG, PG)
+        <!-- 1. Load Flask Static JavaScript File -->
+            <script src="{{ url_for('static', filename='user.js') }}"></script>
+
+        <!-- 2. Test Execution Logic -->
+            <script>
+        // Master Question Bank for all streams
         const masterQuestions = [
             {
                 q: "1. What type of activity excites you the most when learning or working on a project?",
@@ -129,41 +132,53 @@
             "Law & Civil Services": 0
         };
 
-        // Function to shuffle array randomly
+        // Utility to shuffle array elements
         function shuffle(array) {
             return array.sort(() => Math.random() - 0.5);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderUserNavbar('test');
+            // Render Taskbar Navigation
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('test');
+            }
             
-            // Randomly select 5 questions out of the 7 master questions
+            // Pick 5 random questions from master list
             selectedQuestions = shuffle([...masterQuestions]).slice(0, 5);
-            document.getElementById('q-total').textContent = selectedQuestions.length;
+            
+            const totalEl = document.getElementById('q-total');
+            if (totalEl) totalEl.textContent = selectedQuestions.length;
             
             loadQuestion();
         });
 
         function loadQuestion() {
-            const q = selectedQuestions[currentQ];
-            document.getElementById('q-num').textContent = currentQ + 1;
-            document.getElementById('q-text').textContent = q.q;
-            document.getElementById('progress').style.width = `${((currentQ + 1) / selectedQuestions.length) * 100}%`;
+        const q = selectedQuestions[currentQ];
+    
+        const numEl = document.getElementById('q-num');
+        if (numEl) numEl.textContent = currentQ + 1;
+
+        // Clean hardcoded prefix numbers if present
+        const cleanText = q.q.replace(/^\d+\.\s*/, '');
+        const textEl = document.getElementById('q-text');
+            if (textEl) textEl.textContent = `${currentQ + 1}. ${cleanText}`;
+
+            const progressEl = document.getElementById('progress');
+            if (progressEl) progressEl.style.width = `${((currentQ + 1) / selectedQuestions.length) * 100}%`;
 
             const container = document.getElementById('options-container');
+            if (!container) return;
             container.innerHTML = '';
 
-            // Shuffle options for each question so choice order is also dynamic
             const shuffledOptions = shuffle([...q.options]);
-
             shuffledOptions.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt.text;
-                btn.onclick = () => selectOption(opt.tag);
-                container.appendChild(btn);
-            });
-        }
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => selectOption(opt.tag);
+            container.appendChild(btn);
+        });
+    }
 
         function selectOption(tag) {
             if (scores.hasOwnProperty(tag)) {
@@ -178,11 +193,14 @@
         }
 
         function finishTest() {
-            const user = Storage.getUser();
-            user.testCompleted = true;
-            Storage.setUser(user);
+            // Storage handling with safety fallbacks
+            if (typeof Storage !== 'undefined' && Storage.getUser) {
+                const user = Storage.getUser() || {};
+                user.testCompleted = true;
+                if (Storage.setUser) Storage.setUser(user);
+            }
 
-            // Determine highest scoring domain
+            // Top domain calculation
             let topDomain = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
             
             const domainCareerMapping = {
@@ -214,12 +232,20 @@
                 category: topDomain,
                 topCareer: matchResult.topCareer,
                 description: matchResult.desc,
-                matchScore: 92 + Math.floor(Math.random() * 6) // Random realistic match % (92-97%)
+                matchScore: 92 + Math.floor(Math.random() * 6)
             };
 
-            Storage.setResults(resultData);
-            window.location.href = 'results.html';
-        }
-    </script>
+            if (typeof Storage !== 'undefined' && Storage.setResults) {
+                Storage.setResults(resultData);
+            } else {
+                localStorage.setItem('testResults', JSON.stringify(resultData));
+            }
+
+                // Clean Flask redirect to results route
+                window.location.href = '/user/results';
+            }
+        </script>
+    </body>
+</html>
 </body>
 </html>

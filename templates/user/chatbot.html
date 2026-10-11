@@ -51,15 +51,20 @@
         </div>
     </main>
 
-    <script src="user.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <!-- Script Tag Change -->
+<script src="{{ url_for('static', filename='user.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderUserNavbar === 'function') {
             renderUserNavbar('chatbot');
+        }
 
-            const form = document.getElementById('chat-form');
-            const input = document.getElementById('user-msg');
-            const messages = document.getElementById('chat-messages');
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('user-msg');
+        const messages = document.getElementById('chat-messages');
 
+        if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const text = input.value.trim();
@@ -68,6 +73,7 @@
                 // Render User Message
                 const userMsg = document.createElement('div');
                 userMsg.className = 'msg user';
+                userMsg.style.cssText = 'text-align:right; margin:8px 0; color:#e4e4e7;';
                 userMsg.textContent = text;
                 messages.appendChild(userMsg);
 
@@ -78,12 +84,14 @@
                 setTimeout(() => {
                     const botMsg = document.createElement('div');
                     botMsg.className = 'msg bot';
+                    botMsg.style.cssText = 'margin:8px 0; color:#facc15;';
                     botMsg.textContent = `Based on your profile, focusing on strong fundamentals in Mathematics and Computer Science will give you the best leverage for that pathway!`;
                     messages.appendChild(botMsg);
                     messages.scrollTop = messages.scrollHeight;
                 }, 800);
             });
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>

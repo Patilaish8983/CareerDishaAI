@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Career Disha AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
@@ -37,6 +42,7 @@
 </head>
 <body>
 
+    <!-- Dynamic Navigation Container -->
     <nav id="user-nav"></nav>
 
     <main>
@@ -45,7 +51,7 @@
                 <h1>Welcome back, <span id="dash-user-name" class="yellow-text">Student</span> 👋</h1>
                 <p>Track your academic profile, take psychometric assessments, and generate your career roadmap.</p>
             </div>
-            <a href="test.html" class="yellow-btn">Take Assessment</a>
+            <a href="/user/test" class="yellow-btn">Take Assessment</a>
         </div>
 
         <div class="grid-stats">
@@ -67,23 +73,23 @@
         </div>
     </main>
 
-    <script src="user.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            renderUserNavbar('dashboard');
-            const user = Storage.getUser();
-            const results = Storage.getResults();
+    
+    <script src="{{ url_for('static', filename='user.js') }}"></script>
+<script>
+    // 1. Render dynamic navigation bar with active tab highlighting
+    renderUserNavbar('dashboard');
 
-            document.getElementById('dash-user-name').textContent = user.name || 'Student';
-            document.getElementById('dash-stream').textContent = user.stream || 'Not Set';
-            
-            if (user.testCompleted) {
-                document.getElementById('dash-test-status').textContent = 'Completed';
-            }
-            if (results && results.topCareer) {
-                document.getElementById('dash-career-match').textContent = results.topCareer;
-            }
-        });
-    </script>
+    // 2. Inject logged-in user name from Flask session or LocalStorage fallback
+    const userNameElement = document.getElementById('dash-user-name');
+    if (userNameElement) {
+        const loggedUser = "{{ session.get('user', {}).get('full_name', '') }}";
+        if (loggedUser) {
+            userNameElement.textContent = loggedUser;
+        } else {
+            const user = Storage.getUser();
+            userNameElement.textContent = user.name || 'Student';
+        }
+    }
+</script>
 </body>
 </html>

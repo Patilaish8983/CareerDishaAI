@@ -31,7 +31,7 @@
     </style>
 </head>
 <body>
-
+    
     <nav id="user-nav"></nav>
 
     <main>
@@ -44,18 +44,15 @@
             <span class="match-badge" id="match-score">92% Compatibility</span>
             <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;" id="primary-career">AI & Software Engineer</h2>
             <p style="color: #a1a1aa; max-width: 600px; margin: 0 auto 2rem auto;" id="primary-desc">You show strong analytical problem-solving traits paired with high quantitative reasoning skills.</p>
-            <a href="careers.html" class="yellow-btn">View Detailed Roadmaps</a>
+            <a href="/user/careers" class="yellow-btn">View Detailed Roadmaps</a>
         </div>
     </main>
 
-    <script src="user.js"></script>
+    <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            renderUserNavbar('results');
-            const res = Storage.getResults();
-            if (res) {
-                document.getElementById('primary-career').textContent = res.topCareer;
-                document.getElementById('match-score').textContent = `${res.matchScore}% Match Score`;
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('results');
             }
         });
     </script>

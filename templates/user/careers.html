@@ -202,10 +202,12 @@
         </div>
     </main>
 
-    <script src="user.js"></script>
+    <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            renderUserNavbar('careers');
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('careers');
+            }
         });
     </script>
 </body>

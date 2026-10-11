@@ -19,18 +19,24 @@ function renderUserNavbar(activeTab) {
     const nav = document.getElementById('user-nav');
     if (!nav) return;
 
+    // Ensure the main container has structural styling classes applied
+    if (!nav.classList.contains('user-navbar')) {
+        nav.classList.add('user-navbar');
+    }
+
+    // Clean Flask Endpoints including Back to Home
     const links = [
-        { name: 'Dashboard', url: 'dashboard.html', id: 'dashboard' },
-        { name: 'Profile & Marks', url: 'profile.html', id: 'profile' },
-        { name: 'Psychometric Test', url: 'test.html', id: 'test' },
-        { name: 'Results', url: 'results.html', id: 'results' },
-        { name: 'Careers & Roadmap', url: 'careers.html', id: 'careers' },
-        { name: 'AI Counselor', url: 'chatbot.html', id: 'chatbot' }
+        { name: 'Dashboard', url: '/user/dashboard', id: 'dashboard' },
+        { name: 'Profile & Marks', url: '/user/profile', id: 'profile' },
+        { name: 'Psychometric Test', url: '/user/test', id: 'test' },
+        { name: 'Results', url: '/user/results', id: 'results' },
+        { name: 'Careers & Roadmap', url: '/user/careers', id: 'careers' },
+        { name: 'AI Counselor', url: '/user/chatbot', id: 'chatbot' }
     ];
 
     nav.innerHTML = `
         <div class="logo-area">
-            <a href="dashboard.html" style="display:flex; align-items:center; gap:0.75rem; text-decoration:none;">
+            <a href="/user/dashboard" style="display:flex; align-items:center; gap:0.75rem; text-decoration:none;">
                 <div class="logo-box bg-yellow">CD</div>
                 <span class="brand-name">Career Disha <span class="yellow-text">AI</span></span>
             </a>
@@ -38,9 +44,10 @@ function renderUserNavbar(activeTab) {
         <div class="nav-links">
             ${links.map(l => `<a href="${l.url}" class="${activeTab === l.id ? 'active' : ''}">${l.name}</a>`).join('')}
         </div>
-        <div class="nav-actions">
+        <div class="nav-actions" style="display:flex; align-items:center; gap:1rem;">
             <span style="font-size: 0.85rem; color: #a1a1aa;">Welcome, <strong id="user-display-name" style="color:#ffffff;">Student</strong></span>
-            <a href="../auth.html?mode=login" class="nav-btn logout-btn">Logout</a>
+            <a href="/" class="nav-btn home-btn" style="text-decoration:none; color:#a1a1aa; font-size:0.85rem;">Home</a>
+            <a href="/auth?mode=login" class="nav-btn logout-btn">Logout</a>
         </div>
     `;
 

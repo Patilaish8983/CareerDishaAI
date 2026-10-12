@@ -1,10 +1,10 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication Portal | Career Disha AI</title>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -62,8 +62,7 @@
         .form-desc { font-size: 0.85rem; color: #a1a1aa; text-align: center; margin-bottom: 2rem; }
 
         .input-group { margin-bottom: 1.25rem; }
-        /* Smooth visibility hide transition layout */
-        .hidden-field { display: none; }
+        .hidden-field { display: none !important; }
         
         label { display: block; font-size: 0.75rem; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
         input[type="text"], input[type="email"], input[type="password"] {
@@ -96,6 +95,7 @@
             transition: opacity 0.2s;
         }
         .submit-btn:hover { opacity: 0.95; }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .form-footer { text-align: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #27272a; font-size: 0.8rem; color: #71717a; }
         .form-footer span { color: #facc15; text-decoration: none; font-weight: 600; cursor: pointer; }
@@ -116,36 +116,36 @@
         <h2 id="portalHeading">Create Your Account</h2>
         <p class="form-desc" id="portalDesc">Join Career Disha AI to permanently save your interactive progress indicators.</p>
 
-        <form onsubmit="handleAuthSubmit(event)">
+        <form id="authForm">
             <!-- Full Name (Hidden during Login) -->
-                <div class="input-group" id="nameFieldGroup">
-                    <label>Full Name</label>
-                    <input type="text" id="fullNameInput" name="full_name" placeholder="Enter full name">
-                </div>
-    
-            <!-- Email Address -->
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" id="emailInput" name="email" required placeholder="name@domain.com">
-                </div>
-    
-            <!-- Password -->
-                <div class="input-group">
-                    <label>Security Password</label>
-                    <input type="password" id="passwordInput" name="password" required placeholder="••••••••">
-                </div>
-    
-            <!-- Terms Checkbox (Hidden during Login) -->
-                <div class="checkbox-container" id="termsFieldGroup">
-                    <input type="checkbox" id="terms" checked>
-                    <label for="terms" class="checkbox-label">I agree to allow the system to securely manage assessment calculations under data privacy laws.</label>
-                </div>
+            <div class="input-group" id="nameFieldGroup">
+                <label>Full Name</label>
+                <input type="text" id="fullNameInput" name="full_name" placeholder="Enter full name" required>
+            </div>
 
-                <button type="submit" class="submit-btn" id="submitBtn">Register & Begin Dashboard</button>
+            <!-- Email Address -->
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="emailInput" name="email" required placeholder="name@domain.com">
+            </div>
+
+            <!-- Password -->
+            <div class="input-group">
+                <label>Security Password</label>
+                <input type="password" id="passwordInput" name="password" required placeholder="••••••••" minlength="6">
+            </div>
+
+            <!-- Terms Checkbox (Hidden during Login) -->
+            <div class="checkbox-container" id="termsFieldGroup">
+                <input type="checkbox" id="terms" checked required>
+                <label for="terms" class="checkbox-label">I agree to allow the system to securely manage assessment calculations under data privacy laws.</label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Register & Begin Assessment</button>
         </form>
 
         <div class="form-footer" id="toggleFooterMessage">
-            Already possess an account? <span onclick="switchMode('login')">Sign In</span>
+            Already possess an account? <span id="toggleModeBtn">Sign In</span>
         </div>
     </div>
 
@@ -153,39 +153,44 @@
         &copy; 2026 Career Disha AI. All analytical processing parameters protected.
     </footer>
 
-    <!-- INTERLINKING & SWITCHING ENGINE -->
-    <script>
+    <!-- FIREBASE CLIENT-SIDE SDK & AUTH LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Web Config for project career-smartcounselling
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyReplaceIfYourFriendGeneratedOne",
+            authDomain: "career-smartcounselling.firebaseapp.com",
+            projectId: "career-smartcounselling",
+            storageBucket: "career-smartcounselling.appspot.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         let currentMode = "signup";
 
-        // Automatically configure state when user first lands on the page
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const modeParam = urlParams.get('mode');
-            if (modeParam === 'login') {
-                switchMode('login');
-            } else {
-                switchMode('signup');
-            }
-        });
+        const nameGroup = document.getElementById('nameFieldGroup');
+        const nameInput = document.getElementById('fullNameInput');
+        const termsGroup = document.getElementById('termsFieldGroup');
+        const termsCheckbox = document.getElementById('terms');
+        const heading = document.getElementById('portalHeading');
+        const desc = document.getElementById('portalDesc');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleBtn = document.getElementById('toggleModeBtn');
+        const footerMsg = document.getElementById('toggleFooterMessage');
+        const icon = document.getElementById('portalIcon');
+        const authForm = document.getElementById('authForm');
 
-        // Changes UI structures instantaneously without hitting servers
         function switchMode(targetMode) {
             currentMode = targetMode;
-            
-            const nameGroup = document.getElementById('nameFieldGroup');
-            const nameInput = document.getElementById('fullNameInput');
-            const termsGroup = document.getElementById('termsFieldGroup');
-            const termsCheckbox = document.getElementById('terms');
-            const heading = document.getElementById('portalHeading');
-            const desc = document.getElementById('portalDesc');
-            const submitBtn = document.getElementById('submitBtn');
-            const footerMsg = document.getElementById('toggleFooterMessage');
-            const icon = document.getElementById('portalIcon');
 
             if (targetMode === 'login') {
-                // Setup layout state fields for sign-in workflows
                 nameGroup.classList.add('hidden-field');
-                nameInput.removeAttribute('required'); // Prevent HTML verification blockages
+                nameInput.removeAttribute('required');
                 termsGroup.classList.add('hidden-field');
                 termsCheckbox.removeAttribute('required');
 
@@ -193,9 +198,8 @@
                 heading.innerText = "Welcome Back";
                 desc.innerText = "Enter credentials securely to pipeline into active profile tracks.";
                 submitBtn.innerText = "Sign In & Access Portal";
-                footerMsg.innerHTML = `New to Career Disha AI? <span onclick="switchMode('signup')">Create Account</span>`;
+                footerMsg.innerHTML = `New to Career Disha AI? <span id="toggleModeBtn" style="color: #facc15; cursor: pointer; font-weight: 600;">Create Account</span>`;
             } else {
-                // Setup layouts parameters for new user signup profiles
                 nameGroup.classList.remove('hidden-field');
                 nameInput.setAttribute('required', 'true');
                 termsGroup.classList.remove('hidden-field');
@@ -204,56 +208,62 @@
                 icon.innerText = "👤";
                 heading.innerText = "Create Your Account";
                 desc.innerText = "Join Career Disha AI to permanently save your interactive progress indicators.";
-                submitBtn.innerText = "Register & Begin Dashboard";
-                footerMsg.innerHTML = `Already possess an account? <span onclick="switchMode('login')">Sign In</span>`;
+                submitBtn.innerText = "Register & Begin Assessment";
+                footerMsg.innerHTML = `Already possess an account? <span id="toggleModeBtn" style="color: #facc15; cursor: pointer; font-weight: 600;">Sign In</span>`;
             }
-        }
 
-                async function handleAuthSubmit(event) {
-                    event.preventDefault(); // Stop default browser page reload
-
-                    const fullName = document.getElementById('fullNameInput').value;
-                    const email = document.getElementById('emailInput').value;
-                    const password = document.getElementById('passwordInput').value;
-
-                try {
-                    const response = await fetch('/auth', {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                    'full_name': fullName,
-                    'email': email,
-                    'password': password
-                    })
+            document.getElementById('toggleModeBtn').addEventListener('click', () => {
+                switchMode(currentMode === 'signup' ? 'login' : 'signup');
             });
-
-                if (response.redirected) {
-                // Flask returned a redirect -> jump straight to Dashboard!
-                    window.location.href = response.url;
-                    } else {
-                            const data = await response.json();
-                            if (data.status === 'success') {
-                            window.location.href = '/user/dashboard';
-                            }
-                        }
-                    } catch (error) {
-                            console.error("Error during authentication submission:", error);
-                        }
-                    }
-
-        function handleAuthSubmit(event) {
-            event.preventDefault();
-            if (currentMode === 'login') {
-                alert("Login evaluation successful! Connecting database streams.");
-            } else {
-                alert("Account registration successful! Directing profiles into workspace nodes.");
-            }
-    
-            // Redirect to your Flask user dashboard route
-            window.location.href = "/user/dashboard";
         }
+
+        toggleBtn.addEventListener('click', () => {
+            switchMode(currentMode === 'signup' ? 'login' : 'signup');
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'login') {
+            switchMode('login');
+        }
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const fullName = document.getElementById('fullNameInput').value.trim() || "Student";
+
+            try {
+                if (currentMode === 'signup') {
+                    submitBtn.innerText = "Creating Profile...";
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = cred.user;
+
+                    // Automatically register user document into Cloud Firestore
+                    await setDoc(doc(db, "users", user.uid), {
+                        full_name: fullName,
+                        email: user.email,
+                        stream: "General",
+                        academicLevel: "Standard Track",
+                        testCompleted: false,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    alert("Registration successful! Redirecting to psychometric assessment.");
+                    window.location.href = "/user/test";
+                } else {
+                    submitBtn.innerText = "Authenticating...";
+                    await signInWithEmailAndPassword(auth, email, password);
+                    window.location.href = "/user/test";
+                }
+            } catch (err) {
+                console.error("Auth Exception:", err);
+                alert(err.message || "Authentication error occurred.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = currentMode === 'signup' ? "Register & Begin Assessment" : "Sign In & Access Portal";
+            }
+        });
     </script>
 </body>
 </html>

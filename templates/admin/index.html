@@ -18,7 +18,6 @@
         .yellow-text { color: #facc15; }
         .bg-yellow { background-color: #facc15; }
 
-        /* Sidebar */
         aside {
             width: 260px;
             background-color: #09090b;
@@ -109,10 +108,10 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: color 0.2s;
         }
         .exit-link:hover { color: #facc15; }
 
-        /* Main Workspace Area */
         .workspace {
             margin-left: 260px;
             flex: 1;
@@ -132,10 +131,15 @@
             top: 0;
             z-index: 40;
         }
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
         .traffic-pill {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
             background-color: #18181b;
             border: 1px solid #27272a;
             padding: 0.4rem 0.9rem;
@@ -157,7 +161,6 @@
             width: 100%;
         }
 
-        /* Standard Cards & Tables */
         .section-panel { display: none; }
         .section-panel.active-panel { display: block; animation: fadeIn 0.25s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -209,7 +212,6 @@
         }
         .btn-danger:hover { background-color: #ef4444; color: #ffffff; }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -229,7 +231,6 @@
         .stat-value { font-size: 2.2rem; font-weight: 800; color: #ffffff; margin: 0.4rem 0; }
         .stat-footnote { font-size: 0.8rem; color: #71717a; display: flex; align-items: center; gap: 0.35rem; }
 
-        /* Table Box */
         .table-container {
             background-color: #18181b;
             border: 1px solid #27272a;
@@ -290,7 +291,6 @@
         .tag-yellow { background-color: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); color: #facc15; }
         .tag-green { background-color: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #22c55e; }
 
-        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -340,7 +340,6 @@
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
     <aside>
         <div class="brand-area">
             <div class="logo-box">CD</div>
@@ -369,22 +368,21 @@
         </ul>
 
         <div class="sidebar-footer">
-            <button onclick="exportDataDump()" class="btn-secondary" style="width:100%; font-size:0.8rem;">📦 Export JSON Database</button>
-            <a href="../landing.html" class="exit-link">← Return to Student Portal</a>
+            <a href="/" class="exit-link">← Return to Student Portal</a>
         </div>
     </aside>
 
-    <!-- Workspace -->
     <div class="workspace">
         <header>
             <div style="font-size: 0.85rem; color: #a1a1aa;">
                 System Control Engine / <strong style="color: #ffffff;" id="headerBreadcrumb">Dashboard Overview</strong>
             </div>
 
-            <div class="traffic-pill">
-                <div class="traffic-pulse"></div>
-                <span>Total Project Hits: <strong id="visitorCount" class="yellow-text">1,248</strong></span>
-                <button onclick="incrementTrafficDemo()" style="background: none; border:none; color:#facc15; cursor:pointer; font-size:0.75rem;" title="Simulate Visitor Click">⚡ +1</button>
+            <div class="status-container">
+                <div class="traffic-pill">
+                    <div class="traffic-pulse"></div>
+                    <span>Total Live Visits: <strong id="visitorCount" class="yellow-text">0</strong></span>
+                </div>
             </div>
         </header>
 
@@ -395,58 +393,58 @@
                 <div class="panel-heading">
                     <div>
                         <h1>Administrative <span class="yellow-text">Analytics Engine</span></h1>
-                        <p>Live health metrics, assessment test traffic, and career recommendation aggregates.</p>
+                        <p>Aggregated records queried from Firebase Firestore.</p>
                     </div>
-                    <button class="btn-primary" onclick="seedSampleData()">⚡ Refresh / Reseed Demo Data</button>
+                    <button class="btn-primary" onclick="loadDashboardStats()" id="refreshBtn">⚡ Refresh Cloud Data</button>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
                         <span class="stat-label">Total Student Profiles</span>
                         <div class="stat-value" id="stat-students">0</div>
-                        <span class="stat-footnote">Active accounts registered</span>
+                        <span class="stat-footnote">Active accounts in Firestore</span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-label">Assessment Questions</span>
                         <div class="stat-value yellow-text" id="stat-questions">0</div>
-                        <span class="stat-footnote">Live in psychometric test bank</span>
+                        <span class="stat-footnote">Stored in question bank</span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-label">Assessments Completed</span>
                         <div class="stat-value" id="stat-tests">0</div>
-                        <span class="stat-footnote">Psychometric reports issued</span>
+                        <span class="stat-footnote">Submissions recorded</span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-label">Curated Career Paths</span>
                         <div class="stat-value" id="stat-careers">0</div>
-                        <span class="stat-footnote">Pathways mapped in database</span>
+                        <span class="stat-footnote">Configured pathways</span>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <div class="table-container" style="padding: 1.5rem;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🔥 Most In-Demand Careers</h3>
-                        <p style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 1rem;">Based on student assessment results calculation</p>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🔥 Career Pathways In Database</h3>
+                        <p style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 1rem;">Available career pathways mapped in the system</p>
                         <div id="careerBreakdownList" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
                     </div>
                     <div class="table-container" style="padding: 1.5rem;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🛡️ Project System Status</h3>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🛡️ Live Database Connectivity</h3>
                         <ul style="list-style: none; font-size: 0.88rem; color: #a1a1aa; line-height: 2;">
-                            <li>• <strong>Engine:</strong> Career Disha AI Core 2.4</li>
-                            <li>• <strong>Assessment Algorithm:</strong> 5-Factor Vector Scoring</li>
-                            <li>• <strong>Data Storage:</strong> LocalStorage / Cloud Firestore ready</li>
-                            <li>• <strong>Campus Placement Eligibility Check:</strong> Active</li>
+                            <li>• <strong>Backend Service:</strong> Flask Application Server</li>
+                            <li>• <strong>Cloud Database:</strong> Google Cloud Firestore</li>
+                            <li>• <strong>Authentication:</strong> Firebase Admin SDK Service Account</li>
+                            <li>• <strong>Synchronization:</strong> Asynchronous REST Data Fetch</li>
                         </ul>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. USERS (REGISTERED STUDENTS) -->
+            <!-- 2. USERS -->
             <section id="panel-users" class="section-panel">
                 <div class="panel-heading">
                     <div>
                         <h1>Registered <span class="yellow-text">Students Directory</span></h1>
-                        <p>Manage candidate profiles, academic levels, streams, and test completion states.</p>
+                        <p>Candidate profiles, streams, and test completion states retrieved from Firestore.</p>
                     </div>
                 </div>
 
@@ -462,7 +460,7 @@
                                 <th>Email Address</th>
                                 <th>Education & Stream</th>
                                 <th>Assessment Status</th>
-                                <th>Action</th>
+                                <th>Record Ref</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody"></tbody>
@@ -470,12 +468,12 @@
                 </div>
             </section>
 
-            <!-- 3. TESTS / QUESTIONS MANAGEMENT (5 OPTIONS) -->
+            <!-- 3. QUESTIONS -->
             <section id="panel-questions" class="section-panel">
                 <div class="panel-heading">
                     <div>
                         <h1>Psychometric <span class="yellow-text">Question Bank (5-Domain Model)</span></h1>
-                        <p>Configure scenarios and 5 multi-disciplinary response options mapping to individual career streams.</p>
+                        <p>Questions configured and stored in Firestore.</p>
                     </div>
                     <button class="btn-primary" onclick="openQuestionModal()">+ Add New 5-Option Question</button>
                 </div>
@@ -495,12 +493,12 @@
                 </div>
             </section>
 
-            <!-- 4. RESULTS OVERVIEW -->
+            <!-- 4. RESULTS -->
             <section id="panel-results" class="section-panel">
                 <div class="panel-heading">
                     <div>
                         <h1>Student Assessment <span class="yellow-text">Results & Analytics</span></h1>
-                        <p>Psychometric choices, matched domains, and compatibility accuracy data.</p>
+                        <p>Real-time submission reports fetched from Firestore collections.</p>
                     </div>
                 </div>
 
@@ -520,12 +518,12 @@
                 </div>
             </section>
 
-            <!-- 5. CAREERS (ADD/EDIT/DELETE) -->
+            <!-- 5. CAREERS -->
             <section id="panel-careers" class="section-panel">
                 <div class="panel-heading">
                     <div>
                         <h1>Curated <span class="yellow-text">Career Pathways</span></h1>
-                        <p>Configure career domains, descriptions, expected salary slabs, and roadmaps.</p>
+                        <p>Career profiles and salary benchmarks stored in Firestore.</p>
                     </div>
                     <button class="btn-primary" onclick="openCareerModal()">+ Add New Career Option</button>
                 </div>
@@ -548,7 +546,7 @@
         </div>
     </div>
 
-    <!-- 5-Option Question Modal -->
+    <!-- Question Modal -->
     <div class="modal-overlay" id="questionModal">
         <div class="modal-card">
             <h3 id="questionModalTitle">Add 5-Option Assessment Question</h3>
@@ -560,7 +558,6 @@
                     <input type="text" class="form-control" id="form-q-text" placeholder="e.g. What activity excites you most when learning?" required>
                 </div>
 
-                <!-- Option 1 -->
                 <div class="form-group">
                     <label>Option 1</label>
                     <div class="opt-row">
@@ -575,7 +572,6 @@
                     </div>
                 </div>
 
-                <!-- Option 2 -->
                 <div class="form-group">
                     <label>Option 2</label>
                     <div class="opt-row">
@@ -590,7 +586,6 @@
                     </div>
                 </div>
 
-                <!-- Option 3 -->
                 <div class="form-group">
                     <label>Option 3</label>
                     <div class="opt-row">
@@ -605,7 +600,6 @@
                     </div>
                 </div>
 
-                <!-- Option 4 -->
                 <div class="form-group">
                     <label>Option 4</label>
                     <div class="opt-row">
@@ -620,7 +614,6 @@
                     </div>
                 </div>
 
-                <!-- Option 5 -->
                 <div class="form-group">
                     <label>Option 5</label>
                     <div class="opt-row">
@@ -673,6 +666,6 @@
         </div>
     </div>
 
-    <script src="admin.js"></script>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
 </html>

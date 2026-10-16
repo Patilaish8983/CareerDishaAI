@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication Portal | Career Disha AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -144,8 +145,9 @@
             <button type="submit" class="submit-btn" id="submitBtn">Register & Begin Assessment</button>
         </form>
 
-        <div class="form-footer" id="toggleFooterMessage">
-            Already possess an account? <span id="toggleModeBtn">Sign In</span>
+        <div class="form-footer">
+            <span id="togglePromptText">Already possess an account?</span> 
+            <span id="toggleModeLink" style="color: #facc15; cursor: pointer; font-weight: 600;">Sign In</span>
         </div>
     </div>
 
@@ -153,18 +155,20 @@
         &copy; 2026 Career Disha AI. All analytical processing parameters protected.
     </footer>
 
-    <!-- FIREBASE CLIENT-SIDE SDK & AUTH LOGIC -->
+    <!-- INTERNAL FIREBASE CLIENT-SIDE SDK & AUTH LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Web Config for project career-smartcounselling
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyReplaceIfYourFriendGeneratedOne",
+            apiKey: "AIzaSyDFvSfjVahD4j73-Tec0r046piSDNUSjAc",
             authDomain: "career-smartcounselling.firebaseapp.com",
             projectId: "career-smartcounselling",
-            storageBucket: "career-smartcounselling.appspot.com"
+            storageBucket: "career-smartcounselling.firebasestorage.app",
+            messagingSenderId: "1036367017854",
+            appId: "1:1036367017854:web:2983d4b6c6f46edb64e52f",
+            measurementId: "G-N7TV455JWM"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -180,15 +184,13 @@
         const heading = document.getElementById('portalHeading');
         const desc = document.getElementById('portalDesc');
         const submitBtn = document.getElementById('submitBtn');
-        const toggleBtn = document.getElementById('toggleModeBtn');
-        const footerMsg = document.getElementById('toggleFooterMessage');
+        const toggleLink = document.getElementById('toggleModeLink');
+        const togglePromptText = document.getElementById('togglePromptText');
         const icon = document.getElementById('portalIcon');
         const authForm = document.getElementById('authForm');
 
-        function switchMode(targetMode) {
-            currentMode = targetMode;
-
-            if (targetMode === 'login') {
+        function updateUI() {
+            if (currentMode === 'login') {
                 nameGroup.classList.add('hidden-field');
                 nameInput.removeAttribute('required');
                 termsGroup.classList.add('hidden-field');
@@ -198,7 +200,8 @@
                 heading.innerText = "Welcome Back";
                 desc.innerText = "Enter credentials securely to pipeline into active profile tracks.";
                 submitBtn.innerText = "Sign In & Access Portal";
-                footerMsg.innerHTML = `New to Career Disha AI? <span id="toggleModeBtn" style="color: #facc15; cursor: pointer; font-weight: 600;">Create Account</span>`;
+                togglePromptText.innerText = "New to Career Disha AI?";
+                toggleLink.innerText = "Create Account";
             } else {
                 nameGroup.classList.remove('hidden-field');
                 nameInput.setAttribute('required', 'true');
@@ -209,22 +212,23 @@
                 heading.innerText = "Create Your Account";
                 desc.innerText = "Join Career Disha AI to permanently save your interactive progress indicators.";
                 submitBtn.innerText = "Register & Begin Assessment";
-                footerMsg.innerHTML = `Already possess an account? <span id="toggleModeBtn" style="color: #facc15; cursor: pointer; font-weight: 600;">Sign In</span>`;
+                togglePromptText.innerText = "Already possess an account?";
+                toggleLink.innerText = "Sign In";
             }
-
-            document.getElementById('toggleModeBtn').addEventListener('click', () => {
-                switchMode(currentMode === 'signup' ? 'login' : 'signup');
-            });
         }
 
-        toggleBtn.addEventListener('click', () => {
-            switchMode(currentMode === 'signup' ? 'login' : 'signup');
+        // Single stable click listener to prevent toggling loops
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentMode = currentMode === 'signup' ? 'login' : 'signup';
+            updateUI();
         });
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'login') {
-            switchMode('login');
+            currentMode = 'login';
         }
+        updateUI();
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -235,12 +239,13 @@
             const fullName = document.getElementById('fullNameInput').value.trim() || "Student";
 
             try {
+                let user;
                 if (currentMode === 'signup') {
                     submitBtn.innerText = "Creating Profile...";
                     const cred = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = cred.user;
+                    user = cred.user;
 
-                    // Automatically register user document into Cloud Firestore
+                    // Register user document into Cloud Firestore
                     await setDoc(doc(db, "users", user.uid), {
                         full_name: fullName,
                         email: user.email,
@@ -249,14 +254,28 @@
                         testCompleted: false,
                         createdAt: new Date().toISOString()
                     });
-
-                    alert("Registration successful! Redirecting to psychometric assessment.");
-                    window.location.href = "/user/test";
                 } else {
                     submitBtn.innerText = "Authenticating...";
-                    await signInWithEmailAndPassword(auth, email, password);
-                    window.location.href = "/user/test";
+                    const cred = await signInWithEmailAndPassword(auth, email, password);
+                    user = cred.user;
                 }
+
+                // CRITICAL: Get Firebase ID token and send to Flask to establish session
+                const idToken = await user.getIdToken();
+                const response = await fetch('/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.status === "success") {
+                    // Redirect to dashboard (or change to /user/test if they need to take the test first)
+                    window.location.href = "/user/dashboard";
+                } else {
+                    throw new Error(result.message || "Session establishment failed.");
+                }
+
             } catch (err) {
                 console.error("Auth Exception:", err);
                 alert(err.message || "Authentication error occurred.");

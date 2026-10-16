@@ -94,8 +94,17 @@
         </div>
     </main>
 
+    <!-- FIREBASE MODULE & PROFILE SCRIPT -->
+    <!-- USER JS & FIREBASE SCRIPT -->
     <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
+        // 1. Render the navbar immediately when DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('profile');
+            }
+        });
+
         const streamMapping = {
             "School (8th-10th)": [
                 "School - General (8th - 10th Standard)",
@@ -146,10 +155,10 @@
         function updateStreamOptions() {
             const levelSelect = document.getElementById('prof-level');
             const streamSelect = document.getElementById('prof-stream');
-            const selectedLevel = levelSelect ? levelSelect.value : "High School (11th-12th)";
+            if (!levelSelect || !streamSelect) return;
+            const selectedLevel = levelSelect.value;
 
             streamSelect.innerHTML = '<option value="" disabled selected>Select your Stream / Branch</option>';
-
             const availableStreams = streamMapping[selectedLevel] || [];
             availableStreams.forEach(stream => {
                 const option = document.createElement('option');
@@ -158,42 +167,106 @@
                 streamSelect.appendChild(option);
             });
         }
+    </script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderUserNavbar('profile');
-            const user = Storage.getUser();
+    <!-- FIREBASE AUTH & FIRESTORE SYNC SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            document.getElementById('prof-name').value = user.name || '';
-            if (user.academicLevel) {
-                document.getElementById('prof-level').value = user.academicLevel;
-            }
-            
-            updateStreamOptions();
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFvSfjVahD4j73-Tec0r046piSDNUSjAc",
+            authDomain: "career-smartcounselling.firebaseapp.com",
+            projectId: "career-smartcounselling",
+            storageBucket: "career-smartcounselling.firebasestorage.app",
+            messagingSenderId: "1036367017854",
+            appId: "1:1036367017854:web:2983d4b6c6f46edb64e52f",
+            measurementId: "G-N7TV455JWM"
+        };
 
-            if (user.stream) {
-                document.getElementById('prof-stream').value = user.stream;
-            }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            document.addEventListener('DOMContentLoaded', () => {
-            if (typeof renderUserNavbar === 'function') {
-                renderUserNavbar('profile');
-            }
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = "/auth";
+                } catch (err) {
+                    console.error("Logout error:", err);
+                }
             });
+        }
 
-            document.getElementById('profile-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                user.name = document.getElementById('prof-name').value;
-                user.academicLevel = document.getElementById('prof-level').value;
-                user.stream = document.getElementById('prof-stream').value;
-                user.marks = {
-                    subject1: parseInt(document.getElementById('m1').value) || 0,
-                    subject2: parseInt(document.getElementById('m2').value) || 0,
-                    subject3: parseInt(document.getElementById('m3').value) || 0,
-                    subject4: parseInt(document.getElementById('m4').value) || 0,
-                };
-                Storage.setUser(user);
-                window.location.href = 'test.html';
-            });
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    let fullName = "Student";
+                    let userStream = "";
+                    let userLevel = "High School (11th-12th)";
+
+                    if (userDocSnap.exists()) {
+                        const data = userDocSnap.data();
+                        if (data.full_name) fullName = data.full_name;
+                        if (data.stream) userStream = data.stream;
+                        if (data.academicLevel) userLevel = data.academicLevel;
+                    }
+
+                    // Update Navbar Name
+                    const navFirstNameElement = document.getElementById('nav-user-first-name');
+                    if (navFirstNameElement) {
+                        navFirstNameElement.textContent = fullName.split(' ')[0];
+                    }
+
+                    // Populate Form Fields
+                    const nameInput = document.getElementById('prof-name');
+                    const levelInput = document.getElementById('prof-level');
+                    const streamInput = document.getElementById('prof-stream');
+
+                    if (nameInput) nameInput.value = fullName;
+                    if (levelInput) {
+                        levelInput.value = userLevel;
+                        if (typeof updateStreamOptions === 'function') updateStreamOptions();
+                    }
+                    if (streamInput && userStream) streamInput.value = userStream;
+
+                } catch (err) {
+                    console.error("Error loading user profile:", err);
+                }
+
+                // Profile Form Submission
+                const profileForm = document.getElementById('profile-form');
+                if (profileForm) {
+                    profileForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const updatedName = document.getElementById('prof-name').value;
+                        const updatedLevel = document.getElementById('prof-level').value;
+                        const updatedStream = document.getElementById('prof-stream').value;
+
+                        try {
+                            await setDoc(doc(db, "users", user.uid), {
+                                full_name: updatedName,
+                                academicLevel: updatedLevel,
+                                stream: updatedStream
+                            }, { merge: true });
+
+                            alert("Profile updated successfully!");
+                            window.location.href = "/user/test";
+                        } catch (err) {
+                            console.error("Error updating profile:", err);
+                            alert("Failed to update profile.");
+                        }
+                    });
+                }
+            } else {
+                window.location.href = "/auth";
+            }
         });
     </script>
 </body>

@@ -23,7 +23,8 @@
         .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover, .nav-links a.active { color: #facc15; }
         .nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
+        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; cursor: pointer; border: none; }
+        .logout-btn:hover { background-color: #3f3f46; }
 
         main { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
         .welcome-card { background: linear-gradient(135deg, #18181b 0%, #09090b 100%); border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
@@ -43,12 +44,32 @@
 <body>
 
     <!-- Dynamic Navigation Container -->
-    <nav id="user-nav"></nav>
+    <nav id="user-nav">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="logo-box bg-yellow">CD</div>
+            <span class="brand-name">Career Disha AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/user/dashboard" class="active">Dashboard</a>
+            <a href="/user/profile">Profile & Marks</a>
+            <a href="/user/test">Psychometric Test</a>
+            <a href="/user/results">Results</a>
+            <a href="/user/careers">Careers & Roadmap</a>
+            <a href="/user/chatbot">AI Counselor</a>
+        </div>
+        <div class="nav-actions">
+            <span style="font-size: 0.85rem; color: #a1a1aa;">
+                Welcome, <strong id="nav-user-first-name" style="color: #ffffff;">Loading...</strong>
+            </span>
+            <a href="/" class="nav-links" style="font-size: 0.85rem; color: #a1a1aa; text-decoration: none;">Home</a>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </nav>
 
     <main>
         <div class="welcome-card">
             <div>
-                <h1>Welcome back, <span id="dash-user-name" class="yellow-text">Student</span> 👋</h1>
+                <h1>Welcome back, <span id="dash-user-name" class="yellow-text">Loading...</span> 👋</h1>
                 <p>Track your academic profile, take psychometric assessments, and generate your career roadmap.</p>
             </div>
             <a href="/user/test" class="yellow-btn">Take Assessment</a>
@@ -57,8 +78,8 @@
         <div class="grid-stats">
             <div class="stat-card">
                 <h4>Academic Profile</h4>
-                <div class="value" id="dash-stream">Science (PCM)</div>
-                <span class="status-badge" id="dash-marks-status">5 Subjects Entered</span>
+                <div class="value" id="dash-stream">General</div>
+                <span class="status-badge" id="dash-marks-status">Active Track</span>
             </div>
             <div class="stat-card">
                 <h4>Psychometric Status</h4>
@@ -67,29 +88,94 @@
             </div>
             <div class="stat-card">
                 <h4>Top Matched Career</h4>
-                <div class="value" id="dash-career-match">AI Specialist</div>
-                <span class="status-badge">94% Match Score</span>
+                <div class="value" id="dash-career-match">Pending Test</div>
+                <span class="status-badge" id="dash-match-score">-- % Match</span>
             </div>
         </div>
     </main>
 
-    
-    <script src="{{ url_for('static', filename='user.js') }}"></script>
-<script>
-    // 1. Render dynamic navigation bar with active tab highlighting
-    renderUserNavbar('dashboard');
+    <!-- FIREBASE CLIENT-SIDE SCRIPT & DYNAMIC DATA BINDING -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 2. Inject logged-in user name from Flask session or LocalStorage fallback
-    const userNameElement = document.getElementById('dash-user-name');
-    if (userNameElement) {
-        const loggedUser = "{{ session.get('user', {}).get('full_name', '') }}";
-        if (loggedUser) {
-            userNameElement.textContent = loggedUser;
-        } else {
-            const user = Storage.getUser();
-            userNameElement.textContent = user.name || 'Student';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFvSfjVahD4j73-Tec0r046piSDNUSjAc",
+            authDomain: "career-smartcounselling.firebaseapp.com",
+            projectId: "career-smartcounselling",
+            storageBucket: "career-smartcounselling.firebasestorage.app",
+            messagingSenderId: "1036367017854",
+            appId: "1:1036367017854:web:2983d4b6c6f46edb64e52f",
+            measurementId: "G-N7TV455JWM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const navFirstNameElement = document.getElementById('nav-user-first-name');
+        const dashUserNameElement = document.getElementById('dash-user-name');
+        const userStreamElement = document.getElementById('dash-stream');
+        const userTestStatusElement = document.getElementById('dash-test-status');
+        const userCareerMatchElement = document.getElementById('dash-career-match');
+        const userMatchScoreElement = document.getElementById('dash-match-score');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Handle Logout
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = "/auth";
+                } catch (err) {
+                    console.error("Logout error:", err);
+                }
+            });
         }
-    }
-</script>
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    let fullName = "Student";
+
+                    if (userDocSnap.exists() && userDocSnap.data().full_name) {
+                        fullName = userDocSnap.data().full_name;
+                    } else if (user.displayName) {
+                        fullName = user.displayName;
+                    }
+
+                    // Extract first name for top navbar
+                    const firstName = fullName.split(' ')[0];
+
+                    if (navFirstNameElement) navFirstNameElement.textContent = firstName;
+                    if (dashUserNameElement) dashUserNameElement.textContent = fullName;
+
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        if (userStreamElement && userData.stream) {
+                            userStreamElement.textContent = userData.stream;
+                        }
+                        if (userTestStatusElement) {
+                            userTestStatusElement.textContent = userData.testCompleted ? "Completed" : "Pending";
+                        }
+                        if (userData.topCareer) {
+                            if (userCareerMatchElement) userCareerMatchElement.textContent = userData.topCareer;
+                            if (userMatchScoreElement && userData.matchScore) {
+                                userMatchScoreElement.textContent = `${userData.matchScore}% Match Score`;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error retrieving user Firestore details:", err);
+                }
+            } else {
+                window.location.href = "/auth";
+            }
+        });
+    </script>
 </body>
 </html>

@@ -9,12 +9,14 @@ template_dir = os.path.join(base_dir, 'templates')
 app = Flask(__name__, template_folder=template_dir)
 app.secret_key = "career_disha-Ai is a smart counselling"
 
-# 1. Main Landing Route
+# ==========================================
+# PUBLIC ROUTES
+# ==========================================
+
 @app.route('/')
 def home():
     return render_template('landing.html')
 
-# 2. Authentication Route
 @app.route('/auth', methods=['GET', 'POST'])
 def authentication():
     if request.method == 'POST':
@@ -31,12 +33,47 @@ def authentication():
 
     return render_template('auth.html')
 
-# 3. User Profile
+
+# ==========================================
+# USER MODULE ROUTES (6 Pages)
+# ==========================================
+
+@app.route('/user/dashboard')
+def user_dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('authentication'))
+    return render_template('user/dashboard.html')
+
+@app.route('/user/test')
+def user_test():
+    if 'user_id' not in session:
+        return redirect(url_for('authentication'))
+    return render_template('user/test.html')
+
+@app.route('/user/careers')
+def user_careers():
+    if 'user_id' not in session:
+        return redirect(url_for('authentication'))
+    return render_template('user/careers.html')
+
+@app.route('/user/results')
+def user_results():
+    if 'user_id' not in session:
+        return redirect(url_for('authentication'))
+    return render_template('user/results.html')
+
 @app.route('/user/profile')
 def user_profile():
     if 'user_id' not in session:
         return redirect(url_for('authentication'))
     return render_template('user/profile.html')
+
+@app.route('/user/chatbot')
+def user_chatbot():
+    if 'user_id' not in session:
+        return redirect(url_for('authentication'))
+    return render_template('user/chatbot.html')
+
 
 # ==========================================
 # ADMIN DASHBOARD & FIREBASE API ROUTES
@@ -44,7 +81,7 @@ def user_profile():
 
 @app.route('/admin')
 def admin_portal():
-    return render_template('admin/index.html')
+    return render_template('admin/dashboard.html')
 
 @app.route('/api/stats/visit', methods=['POST'])
 def record_visit():
@@ -117,7 +154,6 @@ def api_manage_questions():
             if not q_id:
                 return jsonify({"error": "Missing question ID"}), 400
             
-            # Remove id from the body before saving to Firestore
             update_data = {k: v for k, v in payload.items() if k != 'id'}
             db.collection('questions').document(q_id).set(update_data, merge=True)
             return jsonify({"status": "success", "message": "Question updated"})

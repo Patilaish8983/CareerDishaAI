@@ -1,11 +1,11 @@
 // LocalStorage data management for Career Disha AI User Module
 const Storage = {
     getUser: () => JSON.parse(localStorage.getItem('cd_user')) || {
-        name: 'Alex Johnson',
-        email: 'alex.j@example.com',
-        class: '12th Grade',
-        stream: 'Science (PCM)',
-        marks: { physics: 88, math: 92, chemistry: 81, english: 95, cs: 94 },
+        name: 'Student',
+        email: '',
+        class: 'Standard Track',
+        stream: 'General',
+        marks: {},
         testCompleted: false,
         testAnswers: {}
     },
@@ -16,42 +16,46 @@ const Storage = {
 
 // Common Navbar Header Component Injector
 function renderUserNavbar(activeTab) {
-    const nav = document.getElementById('user-nav');
-    if (!nav) return;
+    const navContainer = document.getElementById('user-nav');
+    if (!navContainer) return;
 
-    // Ensure the main container has structural styling classes applied
-    if (!nav.classList.contains('user-navbar')) {
-        nav.classList.add('user-navbar');
-    }
-
-    // Clean Flask Endpoints including Back to Home
-    const links = [
-        { name: 'Dashboard', url: '/user/dashboard', id: 'dashboard' },
-        { name: 'Profile & Marks', url: '/user/profile', id: 'profile' },
-        { name: 'Psychometric Test', url: '/user/test', id: 'test' },
-        { name: 'Results', url: '/user/results', id: 'results' },
-        { name: 'Careers & Roadmap', url: '/user/careers', id: 'careers' },
-        { name: 'AI Counselor', url: '/user/chatbot', id: 'chatbot' }
-    ];
-
-    nav.innerHTML = `
-        <div class="logo-area">
-            <a href="/user/dashboard" style="display:flex; align-items:center; gap:0.75rem; text-decoration:none;">
-                <div class="logo-box bg-yellow">CD</div>
-                <span class="brand-name">Career Disha <span class="yellow-text">AI</span></span>
-            </a>
+    navContainer.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="logo-box bg-yellow">CD</div>
+            <span class="brand-name">Career Disha AI</span>
         </div>
+
         <div class="nav-links">
-            ${links.map(l => `<a href="${l.url}" class="${activeTab === l.id ? 'active' : ''}">${l.name}</a>`).join('')}
+            <a href="/user/dashboard" class="${activeTab === 'dashboard' ? 'active' : ''}">Dashboard</a>
+            <a href="/user/profile" class="${activeTab === 'profile' ? 'active' : ''}">Profile & Marks</a>
+            <a href="/user/test" class="${activeTab === 'test' ? 'active' : ''}">Psychometric Test</a>
+            <a href="/user/results" class="${activeTab === 'results' ? 'active' : ''}">Results</a>
+            <a href="/user/careers" class="${activeTab === 'careers' ? 'active' : ''}">Careers & Roadmap</a>
+            <a href="/user/chatbot" class="${activeTab === 'chatbot' ? 'active' : ''}">AI Counselor</a>
         </div>
-        <div class="nav-actions" style="display:flex; align-items:center; gap:1rem;">
-            <span style="font-size: 0.85rem; color: #a1a1aa;">Welcome, <strong id="user-display-name" style="color:#ffffff;">Student</strong></span>
-            <a href="/" class="nav-btn home-btn" style="text-decoration:none; color:#a1a1aa; font-size:0.85rem;">Home</a>
-            <a href="/auth?mode=login" class="nav-btn logout-btn">Logout</a>
+
+        <div class="nav-actions">
+            <span style="font-size: 0.85rem; color: #a1a1aa;">
+                Welcome, <strong id="nav-user-first-name" style="color: #ffffff;">Loading...</strong>
+            </span>
+            <a href="/" class="nav-links" style="font-size: 0.85rem; color: #a1a1aa; text-decoration: none;">Home</a>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
         </div>
     `;
-
-    const user = Storage.getUser();
-    const nameEl = document.getElementById('user-display-name');
-    if (nameEl && user.name) nameEl.textContent = user.name.split(' ')[0];
 }
+
+// Global Event Listener for Logout Button (Works across all pages)
+document.addEventListener('click', async (e) => {
+    if (e.target && e.target.id === 'logoutBtn') {
+        e.preventDefault();
+        try {
+            const { getAuth, signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+            const auth = getAuth();
+            await signOut(auth);
+            window.location.href = "/auth";
+        } catch (err) {
+            console.error("Logout error:", err);
+            window.location.href = "/auth";
+        }
+    }
+});

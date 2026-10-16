@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Operations Center | Career Disha AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1115; 
+            color: #f4f4f5; 
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .yellow-text { color: #facc15; }
+        .bg-yellow { background-color: #facc15; }
+
+        aside {
+            width: 260px;
+            background-color: #09090b;
+            border-right: 1px solid #27272a;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+        }
+        .brand-area {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid #18181b;
+        }
+        .logo-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #0f1115;
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+        }
+        .brand-text { font-size: 1.15rem; font-weight: 700; color: #ffffff; }
+        .admin-pill {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background-color: rgba(250, 204, 21, 0.15);
+            color: #facc15;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            margin-left: 4px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .nav-item button {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .nav-item button:hover {
+            color: #facc15;
+            background-color: #18181b;
+        }
+        .nav-item button.active {
+            color: #0f1115;
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+            font-weight: 700;
+        }
+
+        .sidebar-footer {
+            padding: 1.25rem 1rem;
+            border-top: 1px solid #18181b;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .exit-link {
+            text-decoration: none;
+            color: #71717a;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+        .exit-link:hover { color: #facc15; }
+
+        .workspace {
+            margin-left: 260px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            padding: 1.2rem 2.5rem;
+            background-color: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #27272a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .traffic-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            color: #e4e4e7;
+        }
+        .traffic-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .content-area {
+            padding: 2.5rem;
+            max-width: 1350px;
+            width: 100%;
+        }
+
+        .section-panel { display: none; }
+        .section-panel.active-panel { display: block; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .panel-heading h1 { font-size: 1.85rem; font-weight: 800; color: #ffffff; }
+        .panel-heading p { color: #a1a1aa; font-size: 0.9rem; margin-top: 0.25rem; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+            color: #0f1115;
+            font-weight: 700;
+            border: none;
+            padding: 0.75rem 1.4rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-secondary {
+            background-color: #27272a;
+            color: #ffffff;
+            border: 1px solid #3f3f46;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .btn-secondary:hover { background-color: #3f3f46; }
+        .btn-danger {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.45rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .btn-danger:hover { background-color: #ef4444; color: #ffffff; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a1a1aa; letter-spacing: 0.5px; }
+        .stat-value { font-size: 2.2rem; font-weight: 800; color: #ffffff; margin: 0.4rem 0; }
+        .stat-footnote { font-size: 0.8rem; color: #71717a; display: flex; align-items: center; gap: 0.35rem; }
+
+        .table-container {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .table-toolbar {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #27272a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .search-input {
+            background-color: #09090b;
+            border: 1px solid #27272a;
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            width: 320px;
+            outline: none;
+        }
+        .search-input:focus { border-color: #facc15; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+        th {
+            background-color: #141416;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #27272a;
+        }
+        td {
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid #222226;
+            color: #e4e4e7;
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+
+        .tag-badge {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background-color: #09090b;
+            border: 1px solid #27272a;
+            color: #e4e4e7;
+        }
+        .tag-yellow { background-color: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); color: #facc15; }
+        .tag-green { background-color: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #22c55e; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card {
+            background-color: #18181b;
+            border: 1px solid #3f3f46;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 760px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-card h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 1.25rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #a1a1aa; margin-bottom: 0.4rem; text-transform: uppercase; }
+        .form-control {
+            width: 100%;
+            background-color: #09090b;
+            border: 1px solid #27272a;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .form-control:focus { border-color: #facc15; }
+        
+        .opt-row {
+            display: grid;
+            grid-template-columns: 1fr 240px;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            align-items: center;
+        }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="brand-area">
+            <div class="logo-box">CD</div>
+            <div>
+                <span class="brand-text">Career Disha AI</span>
+                <span class="admin-pill">ADMIN</span>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <button class="active" onclick="switchTab('dashboard')">📈 <span>Overview Statistics</span></button>
+            </li>
+            <li class="nav-item">
+                <button onclick="switchTab('users')">👥 <span>Registered Students</span></button>
+            </li>
+            <li class="nav-item">
+                <button onclick="switchTab('questions')">📝 <span>Psychometric Question Bank</span></button>
+            </li>
+            <li class="nav-item">
+                <button onclick="switchTab('results')">📊 <span>Student Results</span></button>
+            </li>
+            <li class="nav-item">
+                <button onclick="switchTab('careers')">💼 <span>Manage Careers</span></button>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="/" class="exit-link">← Return to Student Portal</a>
+        </div>
+    </aside>
+
+    <div class="workspace">
+        <header>
+            <div style="font-size: 0.85rem; color: #a1a1aa;">
+                System Control Engine / <strong style="color: #ffffff;" id="headerBreadcrumb">Dashboard Overview</strong>
+            </div>
+
+            <div class="status-container">
+                <div class="traffic-pill">
+                    <div class="traffic-pulse"></div>
+                    <span>Total Live Visits: <strong id="visitorCount" class="yellow-text">0</strong></span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- 1. DASHBOARD OVERVIEW -->
+            <section id="panel-dashboard" class="section-panel active-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h1>Administrative <span class="yellow-text">Analytics Engine</span></h1>
+                        <p>Aggregated records queried from Firebase Firestore.</p>
+                    </div>
+                    <button class="btn-primary" onclick="loadDashboardStats()" id="refreshBtn">⚡ Refresh Cloud Data</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Student Profiles</span>
+                        <div class="stat-value" id="stat-students">0</div>
+                        <span class="stat-footnote">Active accounts in Firestore</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Assessment Questions</span>
+                        <div class="stat-value yellow-text" id="stat-questions">0</div>
+                        <span class="stat-footnote">Stored in question bank</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Assessments Completed</span>
+                        <div class="stat-value" id="stat-tests">0</div>
+                        <span class="stat-footnote">Submissions recorded</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Curated Career Paths</span>
+                        <div class="stat-value" id="stat-careers">0</div>
+                        <span class="stat-footnote">Configured pathways</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="table-container" style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🔥 Career Pathways In Database</h3>
+                        <p style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 1rem;">Available career pathways mapped in the system</p>
+                        <div id="careerBreakdownList" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
+                    </div>
+                    <div class="table-container" style="padding: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🛡️ Live Database Connectivity</h3>
+                        <ul style="list-style: none; font-size: 0.88rem; color: #a1a1aa; line-height: 2;">
+                            <li>• <strong>Backend Service:</strong> Flask Application Server</li>
+                            <li>• <strong>Cloud Database:</strong> Google Cloud Firestore</li>
+                            <li>• <strong>Authentication:</strong> Firebase Admin SDK Service Account</li>
+                            <li>• <strong>Synchronization:</strong> Asynchronous REST Data Fetch</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. USERS -->
+            <section id="panel-users" class="section-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h1>Registered <span class="yellow-text">Students Directory</span></h1>
+                        <p>Candidate profiles, streams, and test completion states retrieved from Firestore.</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-toolbar">
+                        <input type="text" class="search-input" id="searchUser" placeholder="Search by name, email, or stream..." oninput="renderUsersTable()">
+                        <span style="font-size: 0.85rem; color:#71717a;" id="userTableCount">Showing 0 students</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Email Address</th>
+                                <th>Education & Stream</th>
+                                <th>Assessment Status</th>
+                                <th>Record Ref</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. QUESTIONS -->
+            <section id="panel-questions" class="section-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h1>Psychometric <span class="yellow-text">Question Bank (5-Domain Model)</span></h1>
+                        <p>Questions configured and stored in Firestore.</p>
+                    </div>
+                    <button class="btn-primary" onclick="openQuestionModal()">+ Add New 5-Option Question</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 6%;">ID</th>
+                                <th style="width: 40%;">Question Prompt</th>
+                                <th style="width: 42%;">Configured 5 Options & Tags</th>
+                                <th style="width: 12%; text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 4. RESULTS -->
+            <section id="panel-results" class="section-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h1>Student Assessment <span class="yellow-text">Results & Analytics</span></h1>
+                        <p>Real-time submission reports fetched from Firestore collections.</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Dominant Domain</th>
+                                <th>Recommended Top Career</th>
+                                <th>Match Score</th>
+                                <th>Date Generated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. CAREERS -->
+            <section id="panel-careers" class="section-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h1>Curated <span class="yellow-text">Career Pathways</span></h1>
+                        <p>Career profiles and salary benchmarks stored in Firestore.</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCareerModal()">+ Add New Career Option</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Career Pathway & Domain</th>
+                                <th>Description</th>
+                                <th>Annual Package (CTC)</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="careersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="modal-overlay" id="questionModal">
+        <div class="modal-card">
+            <h3 id="questionModalTitle">Add 5-Option Assessment Question</h3>
+            <form id="questionForm" onsubmit="handleQuestionSubmit(event)">
+                <input type="hidden" id="editQuestionIndex" value="-1">
+                
+                <div class="form-group">
+                    <label>Question Prompt / Scenario</label>
+                    <input type="text" class="form-control" id="form-q-text" placeholder="e.g. What activity excites you most when learning?" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Option 1</label>
+                    <div class="opt-row">
+                        <input type="text" class="form-control" id="form-opt-0" placeholder="Option description" required>
+                        <select class="form-control" id="form-tag-0">
+                            <option value="Tech & Software">Tech & Software</option>
+                            <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                            <option value="Finance & Management">Finance & Management</option>
+                            <option value="Creative Arts & Design">Creative Arts & Design</option>
+                            <option value="Law & Civil Services">Law & Civil Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Option 2</label>
+                    <div class="opt-row">
+                        <input type="text" class="form-control" id="form-opt-1" placeholder="Option description" required>
+                        <select class="form-control" id="form-tag-1">
+                            <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                            <option value="Tech & Software">Tech & Software</option>
+                            <option value="Finance & Management">Finance & Management</option>
+                            <option value="Creative Arts & Design">Creative Arts & Design</option>
+                            <option value="Law & Civil Services">Law & Civil Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Option 3</label>
+                    <div class="opt-row">
+                        <input type="text" class="form-control" id="form-opt-2" placeholder="Option description" required>
+                        <select class="form-control" id="form-tag-2">
+                            <option value="Finance & Management">Finance & Management</option>
+                            <option value="Tech & Software">Tech & Software</option>
+                            <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                            <option value="Creative Arts & Design">Creative Arts & Design</option>
+                            <option value="Law & Civil Services">Law & Civil Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Option 4</label>
+                    <div class="opt-row">
+                        <input type="text" class="form-control" id="form-opt-3" placeholder="Option description" required>
+                        <select class="form-control" id="form-tag-3">
+                            <option value="Creative Arts & Design">Creative Arts & Design</option>
+                            <option value="Tech & Software">Tech & Software</option>
+                            <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                            <option value="Finance & Management">Finance & Management</option>
+                            <option value="Law & Civil Services">Law & Civil Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Option 5</label>
+                    <div class="opt-row">
+                        <input type="text" class="form-control" id="form-opt-4" placeholder="Option description" required>
+                        <select class="form-control" id="form-tag-4">
+                            <option value="Law & Civil Services">Law & Civil Services</option>
+                            <option value="Tech & Software">Tech & Software</option>
+                            <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                            <option value="Finance & Management">Finance & Management</option>
+                            <option value="Creative Arts & Design">Creative Arts & Design</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModals()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save 5-Option Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Career Modal -->
+    <div class="modal-overlay" id="careerModal">
+        <div class="modal-card">
+            <h3 id="careerModalTitle">Add New Career Pathway</h3>
+            <form id="careerForm" onsubmit="handleCareerSubmit(event)">
+                <input type="hidden" id="editCareerIndex" value="-1">
+                <div class="form-group">
+                    <label>Career Title</label>
+                    <input type="text" class="form-control" id="form-c-title" placeholder="e.g. Cloud Architect & Devops" required>
+                </div>
+                <div class="form-group">
+                    <label>Domain Tag</label>
+                    <input type="text" class="form-control" id="form-c-tag" placeholder="e.g. Computer Science & IT" required>
+                </div>
+                <div class="form-group">
+                    <label>Salary Range (India CTC)</label>
+                    <input type="text" class="form-control" id="form-c-salary" placeholder="e.g. ₹8,00,000 – ₹32,00,000 / year" required>
+                </div>
+                <div class="form-group">
+                    <label>Short Description & Scope</label>
+                    <textarea class="form-control" id="form-c-desc" rows="3" placeholder="Describe the career responsibilities and scope..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModals()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Career Pathway</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

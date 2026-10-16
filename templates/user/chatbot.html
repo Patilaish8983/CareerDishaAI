@@ -51,47 +51,105 @@
         </div>
     </main>
 
-    <!-- Script Tag Change -->
-<script src="{{ url_for('static', filename='user.js') }}"></script>
+    
+<!-- 1. CHAT LOGIC & NAVBAR RENDERER -->
+    <script src="{{ url_for('static', filename='user.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof renderUserNavbar === 'function') {
+                renderUserNavbar('chatbot');
+            }
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (typeof renderUserNavbar === 'function') {
-            renderUserNavbar('chatbot');
-        }
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('user-msg');
+            const messages = document.getElementById('chat-messages');
 
-        const form = document.getElementById('chat-form');
-        const input = document.getElementById('user-msg');
-        const messages = document.getElementById('chat-messages');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const text = input.value.trim();
+                    if (!text) return;
 
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const text = input.value.trim();
-                if (!text) return;
+                    // Render User Message
+                    const userMsg = document.createElement('div');
+                    userMsg.className = 'msg user';
+                    userMsg.style.cssText = 'text-align:right; margin:8px 0; color:#e4e4e7;';
+                    userMsg.textContent = text;
+                    messages.appendChild(userMsg);
 
-                // Render User Message
-                const userMsg = document.createElement('div');
-                userMsg.className = 'msg user';
-                userMsg.style.cssText = 'text-align:right; margin:8px 0; color:#e4e4e7;';
-                userMsg.textContent = text;
-                messages.appendChild(userMsg);
-
-                input.value = '';
-                messages.scrollTop = messages.scrollHeight;
-
-                // Simulate AI response
-                setTimeout(() => {
-                    const botMsg = document.createElement('div');
-                    botMsg.className = 'msg bot';
-                    botMsg.style.cssText = 'margin:8px 0; color:#facc15;';
-                    botMsg.textContent = `Based on your profile, focusing on strong fundamentals in Mathematics and Computer Science will give you the best leverage for that pathway!`;
-                    messages.appendChild(botMsg);
+                    input.value = '';
                     messages.scrollTop = messages.scrollHeight;
-                }, 800);
+
+                    // Simulate AI response
+                    setTimeout(() => {
+                        const botMsg = document.createElement('div');
+                        botMsg.className = 'msg bot';
+                        botMsg.style.cssText = 'margin:8px 0; color:#facc15;';
+                        botMsg.textContent = `Based on your profile, focusing on strong fundamentals in Mathematics and Computer Science will give you the best leverage for that pathway!`;
+                        messages.appendChild(botMsg);
+                        messages.scrollTop = messages.scrollHeight;
+                    }, 800);
+                });
+            }
+        });
+    </script>
+
+    <!-- 2. FIREBASE AUTH & USERNAME INJECTOR -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFvSfjVahD4j73-Tec0r046piSDNUSjAc",
+            authDomain: "career-smartcounselling.firebaseapp.com",
+            projectId: "career-smartcounselling",
+            storageBucket: "career-smartcounselling.firebasestorage.app",
+            messagingSenderId: "1036367017854",
+            appId: "1:1036367017854:web:2983d4b6c6f46edb64e52f",
+            measurementId: "G-N7TV455JWM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Handle Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = "/auth";
+                } catch (err) {
+                    console.error("Logout error:", err);
+                }
             });
         }
-    });
-</script>
+
+        // Fetch name from Firestore and populate top right navbar
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    let fullName = "User";
+                    if (docSnap.exists() && docSnap.data().full_name) {
+                        fullName = docSnap.data().full_name;
+                    } else if (user.displayName) {
+                        fullName = user.displayName;
+                    }
+
+                    const navEl = document.getElementById('nav-user-first-name');
+                    if (navEl) {
+                        navEl.textContent = fullName.split(' ')[0]; // Displays first name (e.g. Anushka)
+                    }
+                } catch (err) {
+                    console.error("Error loading username in navbar:", err);
+                }
+            } else {
+                window.location.href = "/auth";
+            }
+        });
+    </script>
 </body>
 </html>

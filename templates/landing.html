@@ -56,10 +56,38 @@
         .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover { color: #facc15; }
         
-        .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
-        .login-link { color: #e4e4e7; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color 0.2s; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .login-link { 
+            color: #e4e4e7; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            transition: color 0.2s; 
+            padding: 0.6rem 1rem;
+        }
         .login-link:hover { color: #facc15; }
-        .nav-btn { padding: 0.6rem 1.2rem; border-radius: 10px; font-size: 0.85rem; text-decoration: none; display: inline-block; }
+        .nav-btn { 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 10px; 
+            font-size: 0.85rem; 
+            text-decoration: none; 
+            display: inline-block; 
+            font-weight: 700;
+        }
+
+        /* Admin Button Styling */
+        .admin-btn {
+            border: 1px solid #facc15;
+            color: #facc15;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .admin-btn:hover {
+            background-color: #facc15;
+            color: #0f1115;
+            transform: translateY(-2px);
+        }
 
         header {
             max-width: 1200px;
@@ -176,14 +204,15 @@
             <a href="#psychometric">Psychometric Tests</a>
         </div>
         <div class="nav-actions">
-            <a href="/auth?mode=login" class="login-link">Sign In</a>
-            <a href="/auth?mode=signup" class="nav-btn yellow-btn">Create Account</a>
+            <!-- User and Admin Login actions directly targeted to /auth -->
+            <a href="/auth?role=user" class="login-link">User Login</a>
+            <a href="/auth?role=admin" class="nav-btn admin-btn">Admin Login</a>
         </div>
     </nav>
 
     <header>
         <div>
-            <div class="hero-badge">⚡ Future Proof Your Career</div>
+            <div class="hero-badge">Future Proof Your Career</div>
             <h1>Know Your <span class="yellow-text">Best Version</span>.</h1>
             <p class="hero-desc">Take full opportunity and excel. Don't let credentials restrict you—interact with our advanced AI tools, secure high-value scholarships, and discover curated pathways today.</p>
             <div class="hero-actions">
@@ -217,7 +246,7 @@
         <div class="grid-container">
             <div id="counseling" class="feature-card">
                 <div>
-                    <div class="card-icon bg-yellow">📋</div>
+                    <div class="card-icon bg-yellow">🎯</div>
                     <h3>Smart AI Counseling</h3>
                     <p>Engage with an advisor system framework that analyzes your academic goals and plots career maps.</p>
                 </div>

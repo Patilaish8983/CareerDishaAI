@@ -109,7 +109,7 @@
 
     <header>
         <a href="/" class="back-link">← Back to home platform</a>
-        <span class="system-badge">Authentication Gateway</span>
+        <span class="system-badge" id="badgeText">Authentication Gateway</span>
     </header>
 
     <div class="auth-container">
@@ -145,9 +145,9 @@
             <button type="submit" class="submit-btn" id="submitBtn">Register & Begin Assessment</button>
         </form>
 
-        <div class="form-footer">
+        <div class="form-footer" id="footerToggleBlock">
             <span id="togglePromptText">Already possess an account?</span> 
-            <span id="toggleModeLink" style="color: #facc15; cursor: pointer; font-weight: 600;">Sign In</span>
+            <span id="toggleModeLink">Sign In</span>
         </div>
     </div>
 
@@ -155,7 +155,7 @@
         &copy; 2026 Career Disha AI. All analytical processing parameters protected.
     </footer>
 
-    <!-- INTERNAL FIREBASE CLIENT-SIDE SDK & AUTH LOGIC -->
+    <!-- FIREBASE CLIENT-SIDE SDK & AUTH LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -175,7 +175,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentMode = "signup";
+        // Read query parameters passed from landing page or Flask template
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role') || "{{ role or 'user' }}";
+        const isAdmin = role === 'admin';
+
+        // Admins cannot self-register; they are locked to login mode
+        let currentMode = isAdmin ? "login" : (urlParams.get('mode') === 'signup' ? 'signup' : 'login');
 
         const nameGroup = document.getElementById('nameFieldGroup');
         const nameInput = document.getElementById('fullNameInput');
@@ -188,8 +194,26 @@
         const togglePromptText = document.getElementById('togglePromptText');
         const icon = document.getElementById('portalIcon');
         const authForm = document.getElementById('authForm');
+        const badge = document.getElementById('badgeText');
+        const footerToggleBlock = document.getElementById('footerToggleBlock');
 
         function updateUI() {
+            if (isAdmin) {
+                // Admin mode UI
+                badge.innerText = "Admin Portal Gateway";
+                icon.innerText = "🛡️";
+                heading.innerText = "Admin Console Access";
+                desc.innerText = "Sign in with your authorized administrator credentials.";
+                submitBtn.innerText = "Verify & Access Console";
+                nameGroup.classList.add('hidden-field');
+                nameInput.removeAttribute('required');
+                termsGroup.classList.add('hidden-field');
+                termsCheckbox.removeAttribute('required');
+                footerToggleBlock.style.display = "none"; // Hide sign-up toggle for admins
+                return;
+            }
+
+            // User mode UI
             if (currentMode === 'login') {
                 nameGroup.classList.add('hidden-field');
                 nameInput.removeAttribute('required');
@@ -198,7 +222,7 @@
 
                 icon.innerText = "🔑";
                 heading.innerText = "Welcome Back";
-                desc.innerText = "Enter credentials securely to pipeline into active profile tracks.";
+                desc.innerText = "Enter credentials to access your counseling and tests.";
                 submitBtn.innerText = "Sign In & Access Portal";
                 togglePromptText.innerText = "New to Career Disha AI?";
                 toggleLink.innerText = "Create Account";
@@ -210,24 +234,19 @@
 
                 icon.innerText = "👤";
                 heading.innerText = "Create Your Account";
-                desc.innerText = "Join Career Disha AI to permanently save your interactive progress indicators.";
+                desc.innerText = "Join Career Disha AI to permanently save your progress.";
                 submitBtn.innerText = "Register & Begin Assessment";
                 togglePromptText.innerText = "Already possess an account?";
                 toggleLink.innerText = "Sign In";
             }
         }
 
-        // Single stable click listener to prevent toggling loops
         toggleLink.addEventListener('click', (e) => {
             e.preventDefault();
             currentMode = currentMode === 'signup' ? 'login' : 'signup';
             updateUI();
         });
 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('mode') === 'login') {
-            currentMode = 'login';
-        }
         updateUI();
 
         authForm.addEventListener('submit', async (e) => {
@@ -240,12 +259,12 @@
 
             try {
                 let user;
-                if (currentMode === 'signup') {
+                if (!isAdmin && currentMode === 'signup') {
                     submitBtn.innerText = "Creating Profile...";
                     const cred = await createUserWithEmailAndPassword(auth, email, password);
                     user = cred.user;
 
-                    // Register user document into Cloud Firestore
+                    // Initialize Firestore record for users
                     await setDoc(doc(db, "users", user.uid), {
                         full_name: fullName,
                         email: user.email,
@@ -260,27 +279,33 @@
                     user = cred.user;
                 }
 
-                // CRITICAL: Get Firebase ID token and send to Flask to establish session
+                // 1. Get Firebase ID token
                 const idToken = await user.getIdToken();
-                const response = await fetch('/auth', {
+
+                // 2. Send both idToken AND requested role to /api/login
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken })
+                    body: JSON.stringify({ 
+                        idToken: idToken,
+                        role: isAdmin ? 'admin' : 'user'
+                    })
                 });
 
                 const result = await response.json();
+
                 if (response.ok && result.status === "success") {
-                    // Redirect to dashboard (or change to /user/test if they need to take the test first)
-                    window.location.href = "/user/dashboard";
+                    // Navigate to the dynamic redirect path sent by app.py (/admin/dashboard or /user/profile)
+                    window.location.href = result.redirect;
                 } else {
-                    throw new Error(result.message || "Session establishment failed.");
+                    throw new Error(result.message || "Authentication failed.");
                 }
 
             } catch (err) {
                 console.error("Auth Exception:", err);
                 alert(err.message || "Authentication error occurred.");
                 submitBtn.disabled = false;
-                submitBtn.innerText = currentMode === 'signup' ? "Register & Begin Assessment" : "Sign In & Access Portal";
+                updateUI();
             }
         });
     </script>

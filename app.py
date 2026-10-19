@@ -85,13 +85,13 @@ def api_login():
             })
         
         else:
-            # Standard user login flow
+            # Standard user login flow (Redirects to dashboard)
             session['user_id'] = uid
             session['is_admin'] = is_admin_user
             return jsonify({
                 "status": "success", 
                 "role": "user", 
-                "redirect": "/user/profile"
+                "redirect": "/user/dashboard"
             })
             
     except Exception as e:
@@ -174,6 +174,10 @@ def admin_users():
 # ----------------------------------------------------
 # USER ROUTES (templates/user/...)
 # ----------------------------------------------------
+
+@app.route('/user/dashboard')
+def user_dashboard():
+    return render_template('user/dashboard.html')
 
 @app.route('/user/profile')
 def user_profile():

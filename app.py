@@ -62,8 +62,8 @@ def api_login():
         
         # Whitelisted admin emails
         admin_emails = [
-            "admin@careerdisha.ai",
-            "friend@careerdisha.ai",
+            "anushkaagre7@gmail.com",
+            "gaidharshravani@gmail.com",
             "tirupati23@gmail.com"
         ]
         is_admin_user = email in admin_emails

@@ -21,7 +21,6 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('is_admin'):
-            # Redirect unauthorized users to admin login
             return redirect(url_for('auth_page', role='admin'))
         return f(*args, **kwargs)
     return decorated_function
@@ -30,12 +29,10 @@ def admin_required(f):
 # PUBLIC ROUTES
 # ----------------------------------------------------
 
-# Main landing page route
 @app.route('/')
 def home():
     return render_template('landing.html')
 
-# Authentication gateway route accepting ?role=user or ?role=admin
 @app.route('/auth')
 def auth_page():
     role = request.args.get('role', 'user')
@@ -55,12 +52,10 @@ def api_login():
         return jsonify({"status": "error", "message": "Missing ID token."}), 400
 
     try:
-        # Verify the Firebase ID token sent from the client-side
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         email = decoded_token.get('email', '')
         
-        # Whitelisted admin emails
         admin_emails = [
             "anushkaagre7@gmail.com",
             "gaidharshravani@gmail.com",
@@ -68,7 +63,6 @@ def api_login():
         ]
         is_admin_user = email in admin_emails
         
-        # Guard: Check role mismatch
         if intended_role == 'admin':
             if not is_admin_user:
                 return jsonify({
@@ -85,7 +79,6 @@ def api_login():
             })
         
         else:
-            # Standard user login flow (Redirects to dashboard)
             session['user_id'] = uid
             session['is_admin'] = is_admin_user
             return jsonify({
@@ -103,37 +96,34 @@ def api_logout():
     return jsonify({"status": "success"})
 
 # ----------------------------------------------------
-# SECURED ADMIN ROUTES & DATA APIS
+# SECURED ADMIN SPA & AGGREGATE API
 # ----------------------------------------------------
 
+@app.route('/admin')
 @app.route('/admin/dashboard')
 @admin_required
 def admin_dashboard():
-    # Renders templates/admin/index.html according to your project structure
     return render_template('admin/index.html')
 
-# Endpoint to supply aggregated stats and registered user directory to admin.js
 @app.route('/api/admin/data')
 @admin_required
 def api_admin_data():
     try:
         users_list = []
         
-        # 1. Fetch metadata profiles from Firestore 'users' collection if present
+        # 1. Fetch metadata profiles from Firestore 'users' collection
         firestore_users = {}
         try:
             users_ref = db.collection('users').stream()
             for doc in users_ref:
                 firestore_users[doc.id] = doc.to_dict()
         except Exception as fs_err:
-            print("Firestore query note (optional collection):", fs_err)
+            print("Firestore query note (users):", fs_err)
 
-        # 2. Fetch all registered users from Firebase Authentication directly
+        # 2. Fetch registered users from Firebase Authentication
         page = auth.list_users()
         for user in page.iterate_all():
             profile = firestore_users.get(user.uid, {})
-            
-            # Format and prioritize Firestore profile details, fallback to Auth metadata
             users_list.append({
                 "uid": user.uid,
                 "email": user.email or "N/A",
@@ -144,6 +134,9 @@ def api_admin_data():
                 "createdAt": profile.get("createdAt") or (user.user_metadata.creation_timestamp if user.user_metadata else "Recent")
             })
 
+        # 3. Dynamic counts for Questions and Careers from Firestore
+        question_count = len(list(db.collection('questions').stream()))
+        career_count = len(list(db.collection('careers').stream()))
         total_students = len(users_list)
         completed_tests = sum(1 for u in users_list if u.get("testCompleted"))
 
@@ -151,9 +144,9 @@ def api_admin_data():
             "status": "success",
             "stats": {
                 "total_students": total_students,
-                "assessment_questions": 0,
+                "assessment_questions": question_count,
                 "assessments_completed": completed_tests,
-                "curated_careers": 0
+                "curated_careers": career_count
             },
             "users": users_list
         })
@@ -161,15 +154,145 @@ def api_admin_data():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/admin/questions')
-@admin_required
-def admin_questions():
-    return render_template('admin/questions.html')
+# ----------------------------------------------------
+# QUESTIONS CRUD API (Firestore: 'questions')
+# ----------------------------------------------------
 
-@app.route('/admin/users')
+@app.route('/api/admin/questions', methods=['GET', 'POST'])
 @admin_required
-def admin_users():
-    return render_template('admin/users.html')
+def api_admin_questions():
+    if request.method == 'GET':
+        try:
+            questions = []
+            docs = db.collection('questions').stream()
+            for doc in docs:
+                item = doc.to_dict()
+                item['id'] = doc.id
+                questions.append(item)
+            return jsonify({"status": "success", "questions": questions})
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    elif request.method == 'POST':
+        try:
+            data = request.get_json() or {}
+            prompt = data.get('q') or data.get('prompt')
+            options = data.get('options', [])
+
+            if not prompt or not options:
+                return jsonify({"status": "error", "message": "Prompt and 5 options are required."}), 400
+
+            doc_ref = db.collection('questions').add({
+                "q": prompt,
+                "options": options,
+                "createdAt": firestore.SERVER_TIMESTAMP
+            })
+            return jsonify({"status": "success", "id": doc_ref[1].id}), 201
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/admin/questions/<question_id>', methods=['DELETE'])
+@admin_required
+def api_admin_delete_question(question_id):
+    try:
+        db.collection('questions').document(question_id).delete()
+        return jsonify({"status": "success", "message": "Question deleted."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/admin/questions/<question_id>', methods=['PUT'])
+@admin_required
+def api_admin_update_question(question_id):
+    try:
+        data = request.get_json() or {}
+        prompt = data.get('q') or data.get('prompt')
+        options = data.get('options', [])
+
+        if not prompt or not options:
+            return jsonify({"status": "error", "message": "Prompt and options are required."}), 400
+
+        db.collection('questions').document(question_id).update({
+            "q": prompt,
+            "options": options,
+            "updatedAt": firestore.SERVER_TIMESTAMP
+        })
+        return jsonify({"status": "success", "message": "Question updated successfully."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# ----------------------------------------------------
+# CAREERS CRUD API (Firestore: 'careers')
+# ----------------------------------------------------
+
+@app.route('/api/admin/careers', methods=['GET', 'POST'])
+@admin_required
+def api_admin_careers():
+    if request.method == 'GET':
+        try:
+            careers = []
+            docs = db.collection('careers').stream()
+            for doc in docs:
+                item = doc.to_dict()
+                item['id'] = doc.id
+                careers.append(item)
+            return jsonify({"status": "success", "careers": careers})
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    elif request.method == 'POST':
+        try:
+            data = request.get_json() or {}
+            title = data.get('title')
+            domain = data.get('domain')
+            salary = data.get('salary')
+            description = data.get('description')
+
+            if not title or not domain:
+                return jsonify({"status": "error", "message": "Title and domain tag are required."}), 400
+
+            doc_ref = db.collection('careers').add({
+                "title": title,
+                "domain": domain,
+                "salary": salary,
+                "description": description,
+                "createdAt": firestore.SERVER_TIMESTAMP
+            })
+            return jsonify({"status": "success", "id": doc_ref[1].id}), 201
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/admin/careers/<career_id>', methods=['DELETE'])
+@admin_required
+def api_admin_delete_career(career_id):
+    try:
+        db.collection('careers').document(career_id).delete()
+        return jsonify({"status": "success", "message": "Career deleted."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/admin/careers/<career_id>', methods=['PUT'])
+@admin_required
+def api_admin_update_career(career_id):
+    try:
+        data = request.get_json() or {}
+        title = data.get('title')
+        domain = data.get('domain')
+        salary = data.get('salary')
+        description = data.get('description')
+
+        if not title or not domain:
+            return jsonify({"status": "error", "message": "Title and domain are required."}), 400
+
+        db.collection('careers').document(career_id).update({
+            "title": title,
+            "domain": domain,
+            "salary": salary,
+            "description": description,
+            "updatedAt": firestore.SERVER_TIMESTAMP
+        })
+        return jsonify({"status": "success", "message": "Career updated successfully."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # ----------------------------------------------------
 # USER ROUTES (templates/user/...)

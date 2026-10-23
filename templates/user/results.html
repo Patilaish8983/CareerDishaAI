@@ -41,14 +41,13 @@
         </div>
 
         <div class="result-card">
-            <span class="match-badge" id="match-score">92% Compatibility</span>
-            <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;" id="primary-career">AI & Software Engineer</h2>
-            <p style="color: #a1a1aa; max-width: 600px; margin: 0 auto 2rem auto;" id="primary-desc">You show strong analytical problem-solving traits paired with high quantitative reasoning skills.</p>
+            <span class="match-badge" id="match-score">Calculating Match...</span>
+            <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;" id="primary-career">Analyzing Career Track...</h2>
+            <p style="color: #a1a1aa; max-width: 600px; margin: 0 auto 2rem auto;" id="primary-desc">Evaluating your psychometric responses to generate personalized career insights...</p>
             <a href="/user/careers" class="yellow-btn">View Detailed Roadmaps</a>
         </div>
     </main>
 
-    <script src="{{ url_for('static', filename='user.js') }}"></script>
     <!-- 1. RENDER NAVBAR -->
     <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
@@ -59,7 +58,7 @@
         });
     </script>
 
-    <!-- 2. FIREBASE SCRIPT TO FETCH AND DISPLAY YOUR NAME -->
+    <!-- 2. FIREBASE AUTH, NAVBAR USERNAME & DYNAMIC RESULTS LOADER -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -92,29 +91,64 @@
             });
         }
 
-        // Fetch name from Firestore and update top right navbar
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const docSnap = await getDoc(doc(db, "users", user.uid));
-                    let fullName = "User";
-                    if (docSnap.exists() && docSnap.data().full_name) {
-                        fullName = docSnap.data().full_name;
-                    } else if (user.displayName) {
-                        fullName = user.displayName;
-                    }
+        
 
-                    const navEl = document.getElementById('nav-user-first-name');
-                    if (navEl) {
-                        navEl.textContent = fullName.split(' ')[0]; // Updates "Loading..." to your actual first name
-                    }
-                } catch (err) {
-                    console.error("Error loading username:", err);
-                }
-            } else {
-                window.location.href = "/auth";
+        // Fetch name from Firestore and update top right navbar + Load Quiz Results
+        onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            // Fetch user profile name
+            const docSnap = await getDoc(doc(db, "users", user.uid));
+            let fullName = "User";
+            if (docSnap.exists() && docSnap.data().full_name) {
+                fullName = docSnap.data().full_name;
+            } else if (user.displayName) {
+                fullName = user.displayName;
             }
-        });
+
+            const navEl = document.getElementById('nav-user-first-name');
+            if (navEl) {
+                navEl.textContent = fullName.split(' ')[0];
+            }
+
+            // Get active Firebase Token for Flask Authentication
+            const token = await user.getIdToken();
+
+            // Fetch computed psychometric test results from Flask API with Bearer token
+            const res = await fetch('/api/user/results-data', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            const data = await res.json();
+
+            if (data.status === "success" && data.results) {
+                const r = data.results;
+                
+                const compatibilityEl = document.getElementById("match-score");
+                const titleEl = document.getElementById("primary-career");
+                const descEl = document.getElementById("primary-desc");
+
+                if (compatibilityEl) {
+                    compatibilityEl.innerText = r.compatibility > 0 
+                        ? r.compatibility + "% Compatibility" 
+                        : "Test Pending";
+                }
+                if (titleEl) {
+                    titleEl.innerText = r.career_title || "Take Psychometric Test";
+                }
+                if (descEl) {
+                    descEl.innerText = r.description || "Complete the test to unlock your personalized career match.";
+                }
+            }
+
+        } catch (err) {
+            console.error("Error loading user profile or results:", err);
+        }
+    } else {
+        window.location.href = "/auth";
+    }
+    });
     </script>
 </body>
 </html>

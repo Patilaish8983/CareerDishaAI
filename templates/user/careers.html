@@ -9,199 +9,145 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1115; color: #f4f4f5; line-height: 1.6; }
         .yellow-text { color: #facc15; }
-        .bg-yellow { background-color: #facc15; }
         
-        nav { background-color: rgba(9, 9, 11, 0.9); border-bottom: 1px solid #27272a; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: #0f1115; }
-        .brand-name { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
-        .nav-links { display: flex; gap: 1.5rem; }
-        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; }
-        .nav-links a:hover, .nav-links a.active { color: #facc15; }
-        .nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .logout-btn { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; }
-
-        main { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
-
-        /* Banner for Recruitment Eligibility Rules */
-        .placement-notice {
-            background-color: rgba(250, 204, 21, 0.08);
-            border: 1px solid rgba(250, 204, 21, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 3rem;
-        }
-        .placement-notice h3 { color: #facc15; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        .placement-notice p { font-size: 0.92rem; color: #e4e4e7; line-height: 1.6; }
-        .placement-notice ul { margin-top: 0.75rem; padding-left: 1.25rem; font-size: 0.88rem; color: #a1a1aa; }
-        .placement-notice ul li { margin-bottom: 0.35rem; }
-
-        .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
-        .careers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem; }
-        
-        .career-card { 
-            background-color: #18181b; 
-            border: 1px solid #27272a; 
-            border-radius: 18px; 
-            padding: 1.75rem; 
+        /* Fixed Navbar Styling */
+        nav { 
+            background-color: rgba(9, 9, 11, 0.95); 
+            border-bottom: 1px solid #27272a; 
+            padding: 1rem 2rem; 
             display: flex; 
-            flex-direction: column; 
-            justify-content: space-between;
-            transition: border-color 0.3s, transform 0.2s;
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
         }
-        .career-card:hover { border-color: rgba(250, 204, 21, 0.4); transform: translateY(-3px); }
-        .career-card h3 { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; }
-        .career-card p { font-size: 0.88rem; color: #a1a1aa; margin-bottom: 1.25rem; }
-        
-        .card-tag { display: inline-block; background-color: #09090b; border: 1px solid #27272a; color: #a1a1aa; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 6px; margin-bottom: 0.75rem; }
-        .salary-badge { font-size: 0.9rem; color: #facc15; font-weight: 700; background-color: rgba(250, 204, 21, 0.1); padding: 0.4rem 0.85rem; border-radius: 8px; display: inline-block; }
+        .logo-box { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: #0f1115; background-color: #facc15; }
+        .brand-name { font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-left: 0.75rem; }
+        .nav-brand-container { display: flex; align-items: center; text-decoration: none; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { color: #a1a1aa; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #facc15; font-weight: 600; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; color: #a1a1aa; font-size: 0.88rem; }
+        .logout-btn { padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.8rem; background-color: #27272a; color: #ffffff; text-decoration: none; border: 1px solid #3f3f46; cursor: pointer; }
+        .logout-btn:hover { background-color: #3f3f46; }
 
-        /* Roadmap Section */
-        .roadmap-container { background-color: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 2.5rem; }
-        .roadmap-step { display: flex; gap: 1.5rem; margin-bottom: 1.75rem; }
-        .step-num { width: 40px; height: 40px; border-radius: 50%; background-color: #facc15; color: #0f1115; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; font-size: 1.1rem; }
-        .step-content h4 { font-size: 1.1rem; color: #ffffff; margin-bottom: 0.25rem; }
-        .step-content p { font-size: 0.88rem; color: #a1a1aa; }
+        main { max-width: 1000px; margin: 0 auto; padding: 3rem 1.5rem; }
+        .page-header { text-align: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 2.25rem; font-weight: 800; }
+        .page-header p { color: #a1a1aa; font-size: 0.95rem; }
+
+        /* Dynamic Banner Card */
+        .match-banner { background: linear-gradient(135deg, rgba(250, 204, 21, 0.1) 0%, rgba(24, 24, 27, 0.9) 100%); border: 1px solid #facc15; border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .match-banner h3 { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
+        .match-banner p { color: #a1a1aa; font-size: 0.9rem; margin-top: 0.25rem; }
+        .badge { background-color: #facc15; color: #0f1115; font-weight: 800; font-size: 0.85rem; padding: 0.4rem 1rem; border-radius: 50px; }
+
+        /* Clean Timeline Roadmap Grid */
+        .section-title { font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .roadmap-container { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 3.5rem; }
+        
+        .roadmap-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start; transition: border-color 0.2s; }
+        .roadmap-card:hover { border-color: #facc15; }
+        
+        .step-num { min-width: 42px; height: 42px; border-radius: 12px; background-color: #27272a; color: #facc15; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(250, 204, 21, 0.2); }
+        .step-content h4 { font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem; }
+        .step-time { font-size: 0.78rem; font-weight: 700; color: #facc15; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; display: block; }
+        .step-content p { color: #a1a1aa; font-size: 0.9rem; line-height: 1.5; }
+        
+        .checklist { list-style: none; margin-top: 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem; }
+        .checklist li { color: #d4d4d8; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
+        .checklist li::before { content: "✓"; color: #facc15; font-weight: 800; }
+
+        /* Career Grid */
+        .career-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+        .career-card { background-color: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .career-card h4 { font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; }
+        .career-card p { font-size: 0.85rem; color: #a1a1aa; margin-bottom: 1rem; }
+        .salary-tag { background-color: #09090b; border: 1px solid #27272a; padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; color: #facc15; }
     </style>
 </head>
 <body>
 
+    <!-- 1. Taskbar Navigation -->
     <nav id="user-nav"></nav>
 
     <main>
-        <!-- Corporate Campus Recruitment Eligibility Guidelines -->
-        <div class="placement-notice">
-            <h3>⚡ Critical Campus Placement Criteria (BE, B.Tech, BCA, MCA, BBA)</h3>
-            <p>To qualify for top product and service MNCs during campus hiring drives (e.g., TCS Digital, Infosys, LTIMindtree, Cognizant, Accenture, Wipro, and core engineering firms), maintain the following baseline academic records:</p>
-            <ul>
-                <li><strong>10th Standard:</strong> <strong>Above 90%</strong> recommended (Minimum 60%–70% mandatory across most companies).</li>
-                <li><strong>12th Standard / HSC:</strong> <strong>Above 85%</strong> recommended for top-tier packages.</li>
-                <li><strong>Diploma (Polytechnic):</strong> <strong>Above 85% aggregate</strong> required for direct second-year lateral entry students.</li>
-                <li><strong>Engineering / Degree CGPA:</strong> Maintain an aggregate CGPA of <strong>7.5+ to 8.5+</strong> with <strong>0 active backlogs</strong> at the time of campus drives.</li>
-            </ul>
+        <div class="page-header">
+            <h1>Career Pathways & <span class="yellow-text">Personalized Roadmap</span></h1>
+            <p>Clear, step-by-step milestones tailored to your psychometric analysis</p>
         </div>
 
-        <h2 class="section-title">Top High-Growth <span class="yellow-text">Career Pathways & Salary Insights (India)</span></h2>
-
-        <div class="careers-grid">
-            <!-- CS / IT / AI Domain -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Computer Science & IT</span>
-                    <h3>AI, ML & Full Stack Software Engineer</h3>
-                    <p>Build scalable web applications, machine learning pipelines, and cloud software. Highly demanded across tech startups and product firms.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹6,00,000 – ₹28,00,000 / year</div>
+        <!-- Dynamic Result Header -->
+        <div class="match-banner" id="match-banner">
+            <div>
+                <h3 id="user-domain-title">Loading Career Stream...</h3>
+                <p id="user-domain-desc">Fetching personalized recommendations based on your test profile...</p>
             </div>
-
-            <!-- ENTC / ECE Domain -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Electronics & Telecommunication (ENTC/ECE)</span>
-                    <h3>VLSI Design & Embedded Systems Engineer</h3>
-                    <p>Design semiconductor chips, microcontrollers, IoT devices, and 5G communication systems for hardware tech companies.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹5,50,000 – ₹22,00,000 / year</div>
-            </div>
-
-            <!-- Mechanical Engineering -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Mechanical Engineering</span>
-                    <h3>Robotics, CAD Design & EV Systems Specialist</h3>
-                    <p>Work on Electric Vehicle (EV) powertrain systems, industrial automation, CAD modeling, and automotive manufacturing.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹4,50,000 – ₹16,00,000 / year</div>
-            </div>
-
-            <!-- Chemical Engineering -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Chemical & Process Engineering</span>
-                    <h3>Process Safety & Polymer Technology Specialist</h3>
-                    <p>Manage chemical plant operations, pharmaceutical synthesis, oil & gas refining, and sustainable green energy processes.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹4,80,000 – ₹15,00,000 / year</div>
-            </div>
-
-            <!-- Finance & Business / MBA -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Commerce & Business (BBA / B.Com / MBA)</span>
-                    <h3>Financial Analyst & Business Product Manager</h3>
-                    <p>Analyze equity markets, drive business growth strategies, manage product roadmaps, and oversee corporate operations.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹5,00,000 – ₹24,00,000 / year</div>
-            </div>
-
-            <!-- Creative & UI/UX -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Design & Creative Arts</span>
-                    <h3>UI/UX Product Designer & Brand Specialist</h3>
-                    <p>Create intuitive mobile app interfaces, web design systems, user research journeys, and digital media assets.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹4,20,000 – ₹18,00,000 / year</div>
-            </div>
-
-            <!-- Healthcare & Biotech -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Medical & Life Sciences</span>
-                    <h3>Biotech Researcher & Clinical Data Analyst</h3>
-                    <p>Analyze clinical trial data, biomedical equipment, pharmaceutical formulations, and healthcare informatics.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹4,00,000 – ₹15,00,000 / year</div>
-            </div>
-
-            <!-- Civil Services & Law -->
-            <div class="career-card">
-                <div>
-                    <span class="card-tag">Law & Civil Services</span>
-                    <h3>Corporate Lawyer / Civil Services (IAS/IPS)</h3>
-                    <p>Handle corporate legal contracts, intellectual property, or lead district governance and public administration via UPSC/State PSC.</p>
-                </div>
-                <div class="salary-badge">Salary Range: ₹6,00,000 – ₹20,00,000 / year</div>
-            </div>
+            <span class="badge" id="user-match-score">90%+ Match</span>
         </div>
 
-        <!-- Career Execution Roadmap -->
-        <div class="roadmap-container">
-            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Stage-by-Stage Career Roadmap</h3>
+        <!-- Clean Step-by-Step Roadmap -->
+        <div class="section-title">
+            <span>🗺️</span> Step-by-Step Execution Roadmap
+        </div>
+        <div class="roadmap-container" id="roadmap-list">
+            <!-- Dynamically Populated Clean Roadmap Steps -->
+        </div>
 
-            <div class="roadmap-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                    <h4>School Level (8th - 10th Standard)</h4>
-                    <p>Build basic logical reasoning, math, and communication skills. Target <strong>above 90% in 10th board exams</strong> to keep all diploma and high school stream options open.</p>
+        <!-- High Growth Domain Pathways -->
+        <div class="section-title">
+            <span>💼</span> High-Growth Industry Pathways & Salary Insights (India)
+        </div>
+        <div class="career-grid">
+            <div class="career-card">
+                <div>
+                    <span style="font-size: 0.75rem; color: #facc15; font-weight: 700;">COMPUTER SCIENCE & IT</span>
+                    <h4 style="margin-top: 0.25rem;">Software & AI Development</h4>
+                    <p>Build scalable web applications, machine learning pipelines, and cloud software solutions.</p>
                 </div>
+                <div class="salary-tag">Salary: ₹6,00,000 – ₹28,00,000 / yr</div>
             </div>
 
-            <div class="roadmap-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                    <h4>High School / Junior College / Diploma (11th - 12th / Polytechnic)</h4>
-                    <p>Focus on core stream subjects (PCM, PCB, or Commerce). Aim for <strong>above 85% in 12th or Diploma</strong> to qualify for top engineering (BE/B.Tech), medical, or management colleges.</p>
+            <div class="career-card">
+                <div>
+                    <span style="font-size: 0.75rem; color: #facc15; font-weight: 700;">MEDICAL & LIFE SCIENCES</span>
+                    <h4 style="margin-top: 0.25rem;">Healthcare & Clinical Research</h4>
+                    <p>Diagnose health conditions, lead clinical trials, and advance biotechnology innovation.</p>
                 </div>
+                <div class="salary-tag">Salary: ₹6,50,000 – ₹30,00,000 / yr</div>
             </div>
 
-            <div class="roadmap-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                    <h4>Undergraduate Degree (BE / B.Tech / BCA / BBA / B.Com / B.Sc)</h4>
-                    <p>Maintain an aggregate <strong>CGPA of 8.0+ with zero active backlogs</strong>. Practice Data Structures & Algorithms (Java/Python) for CS/IT/ENTC, or core domain skills for Mechanical, Civil, and Chemical fields. Complete 1-2 real-world industry internships.</p>
+            <div class="career-card">
+                <div>
+                    <span style="font-size: 0.75rem; color: #facc15; font-weight: 700;">FINANCE & MANAGEMENT</span>
+                    <h4 style="margin-top: 0.25rem;">Business & Financial Strategy</h4>
+                    <p>Analyze equity markets, drive business scaling strategies, and manage corporate growth.</p>
                 </div>
+                <div class="salary-tag">Salary: ₹5,00,000 – ₹22,00,000 / yr</div>
             </div>
 
-            <div class="roadmap-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                    <h4>Placement Preparation & Higher Studies (Final Year / PG)</h4>
-                    <p>Prepare for aptitude tests, technical interview rounds, and HR interviews for campus recruitment drives. Alternatively, prepare for GATE, CAT, GRE, or MCA entrance exams.</p>
+            <div class="career-card">
+                <div>
+                    <span style="font-size: 0.75rem; color: #facc15; font-weight: 700;">DESIGN & CREATIVE ARTS</span>
+                    <h4 style="margin-top: 0.25rem;">UI/UX & Product Design</h4>
+                    <p>Create intuitive app interfaces, design systems, and lead user experience research.</p>
                 </div>
+                <div class="salary-tag">Salary: ₹4,20,000 – ₹18,00,000 / yr</div>
+            </div>
+
+            <div class="career-card">
+                <div>
+                    <span style="font-size: 0.75rem; color: #facc15; font-weight: 700;">LAW & PUBLIC GOVERNANCE</span>
+                    <h4 style="margin-top: 0.25rem;">Corporate Law & Public Policy</h4>
+                    <p>Manage corporate legal compliance, legal advocacy, or civil services public administration (IAS/IPS).</p>
+                </div>
+                <div class="salary-tag">Salary: ₹5,50,000 – ₹24,00,000 / yr</div>
             </div>
         </div>
     </main>
 
+    <!-- Render Taskbar Script -->
     <script src="{{ url_for('static', filename='user.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -211,10 +157,10 @@
         });
     </script>
 
-    <!-- FIREBASE AUTH & USERNAME INJECTOR SCRIPT -->
+    <!-- Firebase Auth & Dynamic Roadmap Generator -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -231,23 +177,132 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Handle Logout
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = "/auth";
-                } catch (err) {
-                    console.error("Logout error:", err);
+        const roadmapsByDomain = {
+            "Tech & Software": [
+                {
+                    step: 1,
+                    title: "Core Programming & Computer Science Fundamentals",
+                    time: "Phase 1: Foundations",
+                    desc: "Master Java/Python/C++ along with core Data Structures & Algorithms (Arrays, Linked Lists, Trees).",
+                    checklist: ["LeetCode Problem Solving", "Git & GitHub Version Control", "Linux/Command Line Basics"]
+                },
+                {
+                    step: 2,
+                    title: "Full-Stack & Cloud System Projects",
+                    time: "Phase 2: Project Building",
+                    desc: "Build full-stack web applications with modern frameworks (React, Express, Node.js, Databases).",
+                    checklist: ["RESTful API Development", "Database Schema Design (MySQL/MongoDB)", "Deployment to Vercel/Render"]
+                },
+                {
+                    step: 3,
+                    title: "Technical Interview Prep & Campus Recruitment",
+                    time: "Phase 3: Career Placement",
+                    desc: "Prepare for coding assessments, system design fundamentals, and technical interview rounds.",
+                    checklist: ["Mock Technical Interviews", "Resume & Portfolio Optimization", "System Architecture Practice"]
                 }
-            });
-        }
+            ],
 
-        // Fetch name from Firestore and populate top right navbar
+            "Medical & Life Sciences": [
+                {
+                    step: 1,
+                    title: "Basic Medical & Biological Foundations",
+                    time: "Phase 1: Foundations",
+                    desc: "Build deep foundational knowledge in human anatomy, physiology, organic chemistry, and biology.",
+                    checklist: ["NEET / Entrance Examination Prep", "Lab Equipment & Safety Protocols", "Scientific Paper Reading"]
+                },
+                {
+                    step: 2,
+                    title: "Undergraduate Degree & Clinical Exposure",
+                    time: "Phase 2: Degree & Training",
+                    desc: "Pursue MBBS, BDS, B.Pharm, or B.Sc Biotechnology alongside practical clinical observer positions.",
+                    checklist: ["Clinical Rotations / Internships", "Bio-statistical Analysis", "Pharmacology & Diagnostic Practice"]
+                },
+                {
+                    step: 3,
+                    title: "Specialization & Medical Residency",
+                    time: "Phase 3: Career Entry",
+                    desc: "Target specialization (MD/MS/M.Pharm) or clinical research management roles in biotech firms.",
+                    checklist: ["NEET PG / GATE XL Preparation", "Clinical Trial Research", "Healthcare Licensing & Board Certification"]
+                }
+            ],
+
+            "Finance & Management": [
+                {
+                    step: 1,
+                    title: "Financial Acumen & Commercial Awareness",
+                    time: "Phase 1: Foundations",
+                    desc: "Develop financial modeling skills, corporate accounting comprehension, and economic data analysis.",
+                    checklist: ["Advanced Excel & Financial Functions", "Stock Market & Valuation Concepts", "Business Case Study Practice"]
+                },
+                {
+                    step: 2,
+                    title: "Degree Program & Corporate Internships",
+                    time: "Phase 2: Training & Internships",
+                    desc: "Pursue BBA, B.Com, or MBA while completing summer internships in financial analysis or management.",
+                    checklist: ["Financial Dashboard Building (Power BI)", "Market Competitor Analysis", "Corporate Operations Projects"]
+                },
+                {
+                    step: 3,
+                    title: "Corporate Placements & Leadership",
+                    time: "Phase 3: Professional Entry",
+                    desc: "Prepare for corporate hiring rounds in investment banking, product management, or strategy consulting.",
+                    checklist: ["CAT / GMAT Exam Strategy", "Case Competition Entry", "Executive Communication Prep"]
+                }
+            ],
+
+            "Creative Arts & Design": [
+                {
+                    step: 1,
+                    title: "Visual Fundamentals & Design Principles",
+                    time: "Phase 1: Fundamentals",
+                    desc: "Learn core visual design principles, color theory, typography, and user-centric problem solving.",
+                    checklist: ["Master Figma / Adobe Creative Suite", "Design Fundamentals & Typography", "Wireframing & Sketching"]
+                },
+                {
+                    step: 2,
+                    title: "UI/UX & Creative Portfolio Building",
+                    time: "Phase 2: Portfolio Development",
+                    desc: "Create 2–3 comprehensive design case studies demonstrating user research, wireframes, and high-fidelity prototypes.",
+                    checklist: ["User Persona & Journey Mapping", "Usability Testing Protocols", "Dribbble / Behance Portfolio Showcase"]
+                },
+                {
+                    step: 3,
+                    title: "Design Industry Placement & Freelancing",
+                    time: "Phase 3: Career Launch",
+                    desc: "Apply to design agencies, product studios, or tech startups as a UI/UX, Graphic, or Product Designer.",
+                    checklist: ["Portfolio Review Prep", "Interactive Design Presentations", "Design Systems Practice"]
+                }
+            ],
+
+            "Law & Civil Services": [
+                {
+                    step: 1,
+                    title: "Legal Aptitude & Governance Knowledge",
+                    time: "Phase 1: Foundations",
+                    desc: "Strengthen legal reasoning, constitutional studies, political science, and socio-economic analysis.",
+                    checklist: ["Constitutional Law & Polity", "Current Affairs Tracking", "Moot Court / Debate Participation"]
+                },
+                {
+                    step: 2,
+                    title: "Specialized Education & Competitive Exams",
+                    time: "Phase 2: Qualification",
+                    desc: "Target 5-year Integrated Law (CLAT/MH-CET) or complete Graduation for UPSC Civil Services eligibility.",
+                    checklist: ["CLAT / CET / UPSC Prelims Practice", "Legal Drafting & Essay Writing", "Public Policy Analysis"]
+                },
+                {
+                    step: 3,
+                    title: "Legal Practice & Administrative Service",
+                    time: "Phase 3: Professional Entry",
+                    desc: "Intern with senior court advocates, corporate law firms, or sit for civil service mains and interview rounds.",
+                    checklist: ["Courtroom / NGO Internship", "UPSC Mains Answer Writing Practice", "Mock Board Interview Sessions"]
+                }
+            ]
+        };
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
+                    // Fetch user's registered name for the navbar
                     const docSnap = await getDoc(doc(db, "users", user.uid));
                     let fullName = "User";
                     if (docSnap.exists() && docSnap.data().full_name) {
@@ -258,10 +313,55 @@
 
                     const navEl = document.getElementById('nav-user-first-name');
                     if (navEl) {
-                        navEl.textContent = fullName.split(' ')[0]; // Displays first name (e.g. Anushka)
+                        navEl.textContent = fullName.split(' ')[0];
                     }
+
+                    // Fetch user test results from backend
+                    const token = await user.getIdToken();
+                    const res = await fetch('/api/user/results-data', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    const data = await res.json();
+
+                    let currentDomain = "Tech & Software";
+                    let matchTitle = "Software & AI Specialist";
+                    let matchScore = "90%";
+
+                    if (data.status === "success" && data.results && data.results.top_domain) {
+                        currentDomain = data.results.top_domain;
+                        matchTitle = data.results.career_title || currentDomain;
+                        matchScore = (data.results.compatibility || 90) + "% Match";
+                    }
+
+                    // Update Banner
+                    document.getElementById("user-domain-title").innerText = matchTitle;
+                    document.getElementById("user-domain-desc").innerText = `Personalized roadmap for ${currentDomain}`;
+                    document.getElementById("user-match-score").innerText = matchScore;
+
+                    // Render Clean Step Roadmap
+                    const steps = roadmapsByDomain[currentDomain] || roadmapsByDomain["Tech & Software"];
+                    const container = document.getElementById("roadmap-list");
+                    container.innerHTML = "";
+
+                    steps.forEach(s => {
+                        const card = document.createElement("div");
+                        card.className = "roadmap-card";
+                        card.innerHTML = `
+                            <div class="step-num">${s.step}</div>
+                            <div class="step-content">
+                                <span class="step-time">${s.time}</span>
+                                <h4>${s.title}</h4>
+                                <p>${s.desc}</p>
+                                <ul class="checklist">
+                                    ${s.checklist.map(item => `<li>${item}</li>`).join("")}
+                                </ul>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+
                 } catch (err) {
-                    console.error("Error loading username in navbar:", err);
+                    console.error("Error loading roadmap data or profile:", err);
                 }
             } else {
                 window.location.href = "/auth";

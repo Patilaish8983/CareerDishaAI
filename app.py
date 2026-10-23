@@ -1,18 +1,25 @@
+import os
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from functools import wraps
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
+from scoring_engine import evaluate_psychometric_profile
+
+# Initialize Flask App
+app = Flask(__name__)
+app.secret_key = "super-secret-key-change-this-in-production"
+
+# Absolute path resolution for Firebase service account key (prevents OneDrive path issues)
+basedir = os.path.abspath(os.path.dirname(__file__))
+key_path = os.path.join(basedir, "serviceAccountKey.json")
 
 # Initialize Firebase Admin SDK (prevents re-initialization errors)
 if not firebase_admin._apps:
-    cred = credentials.Certificate("serviceAccountKey.json")
+    cred = credentials.Certificate(key_path)
     firebase_admin.initialize_app(cred)
 
 # Initialize Firestore DB Client
 db = firestore.client()
-
-app = Flask(__name__)
-app.secret_key = "super-secret-key-change-this-in-production"  # Needed for sessions
 
 # ----------------------------------------------------
 # ADMIN PROTECTION DECORATOR
@@ -55,6 +62,7 @@ def api_login():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         email = decoded_token.get('email', '')
+        name = decoded_token.get('name', email.split('@')[0])
         
         admin_emails = [
             "anushkaagre7@gmail.com",
@@ -62,6 +70,19 @@ def api_login():
             "tirupati23@gmail.com"
         ]
         is_admin_user = email in admin_emails
+        
+        # Auto-create or merge user profile in Firestore so they show up in admin lists immediately
+        user_ref = db.collection('users').document(uid)
+        user_doc = user_ref.get()
+        if not user_doc.exists:
+            user_ref.set({
+                "email": email,
+                "full_name": name if name != email.split('@')[0] else "Anushka",
+                "stream": "Information Technology / Engineering",
+                "academicLevel": "Undergraduate",
+                "testCompleted": False,
+                "createdAt": firestore.SERVER_TIMESTAMP
+            }, merge=True)
         
         if intended_role == 'admin':
             if not is_admin_user:
@@ -155,6 +176,36 @@ def api_admin_data():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # ----------------------------------------------------
+# TO PROVIDE TEST RESULTS FOR USER DASHBOARD 
+# ----------------------------------------------------
+@app.route('/api/user/dashboard-data', methods=['GET'])
+def get_user_dashboard_data():
+    uid = get_request_uid()
+    if not uid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        doc = db.collection('users').document(uid).get()
+        if doc.exists:
+            data = doc.to_dict()
+            # Return both formats so frontend JS never misses a field
+            response_data = {
+                "full_name": data.get('full_name', 'Student'),
+                "email": data.get('email', ''),
+                "stream": data.get('stream', 'Engineering'),
+                "testCompleted": data.get('testCompleted', False),
+                "top_domain": data.get('top_domain', 'Pending Assessment'),
+                "career_title": data.get('career_title', 'Complete Test to Unlock'),
+                "compatibility": data.get('compatibility', 0),
+                "academic_recommendation": data.get('academic_recommendation', '')
+            }
+            return jsonify({"status": "success", "data": response_data})
+        else:
+            return jsonify({"status": "success", "data": {"testCompleted": False}})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+        
+
+# ----------------------------------------------------
 # QUESTIONS CRUD API (Firestore: 'questions')
 # ----------------------------------------------------
 
@@ -180,7 +231,7 @@ def api_admin_questions():
             options = data.get('options', [])
 
             if not prompt or not options:
-                return jsonify({"status": "error", "message": "Prompt and 5 options are required."}), 400
+                return jsonify({"status": "error", "message": "Prompt and options are required."}), 400
 
             doc_ref = db.collection('questions').add({
                 "q": prompt,
@@ -291,6 +342,100 @@ def api_admin_update_career(career_id):
             "updatedAt": firestore.SERVER_TIMESTAMP
         })
         return jsonify({"status": "success", "message": "Career updated successfully."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# ----------------------------------------------------
+# HELPER FOR AUTH TOKENS
+# ----------------------------------------------------
+def get_request_uid():
+    if 'user_id' in session:
+        return session['user_id']
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        try:
+            token = auth_header.split(' ')[1]
+            decoded_token = auth.verify_id_token(token)
+            return decoded_token['uid']
+        except Exception:
+            pass
+    return None
+
+# ----------------------------------------------------
+# Admin Questions & Careers Management SPA
+# ----------------------------------------------------
+@app.route('/api/questions', methods=['GET'])
+def get_student_questions():
+    """Fetches questions from Firestore for students taking the test."""
+    try:
+        questions = []
+        docs = db.collection('questions').stream()
+        for doc in docs:
+            item = doc.to_dict()
+            # Ensure the prompt key matches what test.html expects ('q' or 'prompt')
+            if 'prompt' in item and 'q' not in item:
+                item['q'] = item['prompt']
+            questions.append(item)
+            
+        return jsonify({"status": "success", "questions": questions})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# ----------------------------------------------------
+# MULTI-CRITERIA QUIZ SUBMISSION API (Uses scoring_engine.py)
+# ----------------------------------------------------
+
+@app.route('/api/quiz/submit', methods=['POST'])
+def submit_quiz():
+    uid = get_request_uid()
+    if not uid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        
+    try:
+        data = request.get_json() or {}
+        answers_traits = data.get('answers_traits', [])
+        
+        user_doc = db.collection('users').document(uid).get()
+        user_profile = user_doc.to_dict() if user_doc.exists else {}
+        
+        marks_10th = float(user_profile.get('marks_10th', 85.0))
+        marks_12th = float(user_profile.get('marks_12th', 80.0))
+        
+        evaluation = evaluate_psychometric_profile(answers_traits, marks_10th, marks_12th)
+        
+        result_data = {
+            "top_domain": evaluation['top_domain'],
+            "career_title": evaluation['career_title'],
+            "description": f"Multidimensional Evaluation Engine analysis mapped your traits to {evaluation['top_domain']}. {evaluation['academic_recommendation']}",
+            "compatibility": evaluation['compatibility'],
+            "academic_recommendation": evaluation['academic_recommendation'],
+            "testCompleted": True,
+            "updatedAt": firestore.SERVER_TIMESTAMP
+        }
+        
+        db.collection('users').document(uid).set(result_data, merge=True)
+        return jsonify({"status": "success", "redirect": "/user/results"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/user/results-data', methods=['GET'])
+def get_user_results():
+    uid = get_request_uid()
+    if not uid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        doc = db.collection('users').document(uid).get()
+        if doc.exists and doc.to_dict().get('testCompleted'):
+            return jsonify({"status": "success", "results": doc.to_dict()})
+        else:
+            return jsonify({
+                "status": "success", 
+                "results": {
+                    "career_title": "Take Psychometric Test",
+                    "description": "Complete your assessment to generate your multi-criteria evaluation report.",
+                    "compatibility": 0
+                }
+            })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 

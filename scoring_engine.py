@@ -7,8 +7,8 @@ DOMAIN_TRAIT_MATRIX = {
     "Law & Civil Services":    {"R": 0.1, "I": 0.7, "A": 0.2, "S": 0.5, "E": 0.7, "C": 0.9}
 }
 
-# 2. Domain Career Mappings
-CAREER_MAP = {
+# 2. Fallback Map (Used only if Firestore has no careers in a domain)
+FALLBACK_CAREER_MAP = {
     "Tech & Software": "Software & AI Engineer / Data Specialist",
     "Medical & Life Sciences": "Medical Professional / Biotechnologist",
     "Finance & Management": "Business Strategist / Product Manager",
@@ -16,15 +16,16 @@ CAREER_MAP = {
     "Law & Civil Services": "Corporate Lawyer / Civil Servant (IAS/IPS)"
 }
 
-def evaluate_psychometric_profile(answers_traits, marks_10th, marks_12th):
+def evaluate_psychometric_profile(answers_traits, marks_10th, marks_12th, available_careers=None):
     """
     Multi-Criteria Decision Engine:
     - Calculates user RIASEC trait vector from selected options.
     - Evaluates dot-product match against target domain profiles.
     - Applies 10th/12th grade academic pathway multipliers.
+    - Dynamically selects recommended career from Firestore careers.
     """
     
-    # Step A: Aggregate User Trait Scores across all 5 questions
+    # Step A: Aggregate User Trait Scores across all questions
     user_traits = {"R": 0.0, "I": 0.0, "A": 0.0, "S": 0.0, "E": 0.0, "C": 0.0}
     
     if answers_traits:
@@ -50,17 +51,31 @@ def evaluate_psychometric_profile(answers_traits, marks_10th, marks_12th):
     if marks_12th >= 80:
         academic_pathway = "Recommended: Top Autonomous University Degree for Campus Placement Drives"
 
-    # Step D: Dynamic Realistic Normalization (Mapped smoothly between 74% and 94%)
+    # Step D: Dynamic Realistic Normalization
     max_domain = max(domain_scores, key=domain_scores.get)
     highest_raw_score = domain_scores[max_domain]
     
-    # Scale based on max possible theoretical score (~5.0)
     ratio = min(1.0, max(0.3, highest_raw_score / 4.5))
-    compatibility = int(74 + (ratio * 21)) # Generates realistic scores like 79%, 84%, 91%, etc.
+    compatibility = int(74 + (ratio * 21))
+
+    # Step E: Match with Dynamic Careers from Firestore
+    recommended_career = None
+    if available_careers:
+        # Match case-insensitively with domain or tag field in Firestore
+        matches = [
+            c.get('title') for c in available_careers 
+            if c.get('title') and (c.get('domain') or c.get('tag', '')).strip().lower() == max_domain.strip().lower()
+        ]
+        if matches:
+            recommended_career = matches[0]
+
+    # Fallback to default if no matching career was found in Firestore
+    if not recommended_career:
+        recommended_career = FALLBACK_CAREER_MAP.get(max_domain, "Domain Specialist")
 
     return {
         "top_domain": max_domain,
-        "career_title": CAREER_MAP[max_domain],
+        "career_title": recommended_career,
         "compatibility": compatibility,
         "academic_recommendation": academic_pathway,
         "trait_vector": user_traits

@@ -1,6 +1,7 @@
 let allUsers = [];
 let allQuestions = [];
 let allCareers = [];
+let allResults = [];
 
 // Tab Switcher
 function switchTab(tabName) {
@@ -21,6 +22,9 @@ function switchTab(tabName) {
             'careers': 'Manage Careers'
         };
         breadcrumb.innerText = titles[tabName] || 'Dashboard';
+    }
+    if (tabName === 'results') {
+        loadResults();
     }
 }
 
@@ -294,6 +298,52 @@ async function handleQuestionSubmit(e) {
     }
 }
 
+// Fetch Assessment Results from Firestore
+async function loadResults() {
+    try {
+        const res = await fetch('/api/admin/results');
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+            allResults = data.results || [];
+            renderResultsTable();
+        }
+    } catch (err) {
+        console.error("Error loading assessment results:", err);
+    }
+}
+
+// Render Results Table
+function renderResultsTable() {
+    const tbody = document.getElementById('resultsTableBody');
+    if (!tbody) return;
+
+    if (allResults.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#71717a; padding:2.5rem;">No student assessment submissions found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = allResults.map(r => `
+        <tr>
+            <td>
+                <div style="font-weight:700; color:#ffffff;">${escapeHtml(r.studentName || r.name || r.userEmail || 'Anonymous Student')}</div>
+                <div style="font-size:0.75rem; color:#71717a; font-family:monospace;">${escapeHtml(r.studentEmail || r.email || '')}</div>
+            </td>
+            <td>
+                <span class="tag-badge tag-yellow">${escapeHtml(r.dominantDomain || r.domain || 'N/A')}</span>
+            </td>
+            <td>
+                <strong style="color:#ffffff;">${escapeHtml(r.topCareer || r.recommendedCareer || 'General Pathway')}</strong>
+            </td>
+            <td>
+                <span style="font-weight:700; color:#22c55e;">${escapeHtml(String(r.matchScore || r.score || '100'))}%</span>
+            </td>
+            <td style="color:#a1a1aa; font-size:0.85rem;">
+                ${escapeHtml(r.formattedDate || 'Recent')}
+            </td>
+        </tr>
+    `).join('');
+}
+
 // Career Submission Handler (Handles both Create [POST] and Update [PUT])
 async function handleCareerSubmit(e) {
     e.preventDefault();
@@ -375,4 +425,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDashboardStats();
     loadQuestions();
     loadCareers();
+    loadResults();
 });

@@ -36,19 +36,48 @@ function renderUserNavbar(activeTab) {
 
         <div class="nav-actions">
             <span style="font-size: 0.85rem; color: #a1a1aa;">
-                Welcome, <strong id="nav-user-first-name" style="color: #ffffff;">Loading...</strong>
+                Welcome, <strong id="nav-user-first-name" style="color: #ffffff;">Student</strong>
             </span>
             <a href="/" class="nav-links" style="font-size: 0.85rem; color: #a1a1aa; text-decoration: none;">Home</a>
             <button id="logoutBtn" class="logout-btn">Logout</button>
         </div>
     `;
+
+    // Fetch and populate the correct user name for the navbar
+    syncNavbarUserName();
 }
+
+// Helper to keep navbar greeting synchronized with current session
+async function syncNavbarUserName() {
+    try {
+        const res = await fetch('/api/user/dashboard-data');
+        if (res.ok) {
+            const json = await res.json();
+            if (json.status === 'success' && json.data) {
+                const fullName = json.data.full_name || 'Student';
+                const firstName = fullName.split(' ')[0];
+                const navElem = document.getElementById('nav-user-first-name');
+                if (navElem) navElem.textContent = firstName;
+            }
+        }
+    } catch (err) {
+        console.error("Error loading navbar user identity:", err);
+    }
+}
+
+// Automatically sync navbar if nav-user-first-name exists on page load
+document.addEventListener('DOMContentLoaded', () => {
+    syncNavbarUserName();
+});
 
 // Global Event Listener for Logout Button (Works across all pages)
 document.addEventListener('click', async (e) => {
     if (e.target && e.target.id === 'logoutBtn') {
         e.preventDefault();
         try {
+            await fetch('/api/logout', { method: 'POST' });
+            localStorage.clear();
+            sessionStorage.clear();
             const { getAuth, signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
             const auth = getAuth();
             await signOut(auth);

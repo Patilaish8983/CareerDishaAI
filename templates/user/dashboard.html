@@ -94,100 +94,77 @@
         </div>
     </main>
 
-    <!-- FIREBASE CLIENT-SIDE SCRIPT & DYNAMIC DATA BINDING -->
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- CLIENT SCRIPT & DYNAMIC DATA BINDING -->
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const navFirstNameElement = document.getElementById('nav-user-first-name');
+        const dashUserNameElement = document.getElementById('dash-user-name');
+        const userStreamElement = document.getElementById('dash-stream');
+        const userTestStatusElement = document.getElementById('dash-test-status');
+        const userCareerMatchElement = document.getElementById('dash-career-match');
+        const userMatchScoreElement = document.getElementById('dash-match-score');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDFvSfjVahD4j73-Tec0r046piSDNUSjAc",
-        authDomain: "career-smartcounselling.firebaseapp.com",
-        projectId: "career-smartcounselling",
-        storageBucket: "career-smartcounselling.firebasestorage.app",
-        messagingSenderId: "1036367017854",
-        appId: "1:1036367017854:web:2983d4b6c6f46edb64e52f",
-        measurementId: "G-N7TV455JWM"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const navFirstNameElement = document.getElementById('nav-user-first-name');
-    const dashUserNameElement = document.getElementById('dash-user-name');
-    const userStreamElement = document.getElementById('dash-stream');
-    const userTestStatusElement = document.getElementById('dash-test-status');
-    const userCareerMatchElement = document.getElementById('dash-career-match');
-    const userMatchScoreElement = document.getElementById('dash-match-score');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Handle Logout
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                window.location.href = "/auth";
-            } catch (err) {
-                console.error("Logout error:", err);
-            }
-        });
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-
-                let fullName = "Student";
-
-                if (userDocSnap.exists() && userDocSnap.data().full_name) {
-                    fullName = userDocSnap.data().full_name;
-                } else if (user.displayName) {
-                    fullName = user.displayName;
+        // Handle Logout
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = "/auth";
+                } catch (err) {
+                    console.error("Logout error:", err);
+                    window.location.href = "/auth";
                 }
+            });
+        }
+
+        try {
+            // Fetch profile data directly from the active session backend
+            const res = await fetch('/api/user/dashboard-data');
+            
+            if (res.status === 401) {
+                window.location.href = "/auth";
+                return;
+            }
+
+            const json = await res.json();
+
+            if (json.status === 'success' && json.data) {
+                const userData = json.data;
+                const fullName = userData.full_name || 'Student';
 
                 // Extract first name for top navbar
                 const firstName = fullName.split(' ')[0];
 
-                if (navFirstNameElement) navFirstNameElement.textContent = firstName;
+                if (navFirstNameElement) navFirstNameElement.textContent = fullName;
                 if (dashUserNameElement) dashUserNameElement.textContent = fullName;
+                if (userStreamElement) userStreamElement.textContent = userData.stream || "General";
 
-                if (userDocSnap.exists()) {
-                    const userData = userDocSnap.data();
-                    
-                    if (userStreamElement && userData.stream) {
-                        userStreamElement.textContent = userData.stream;
-                    }
-                    
-                    if (userTestStatusElement) {
-                        userTestStatusElement.textContent = userData.testCompleted ? "Completed" : "Pending";
-                    }
-
-                    // FIXED: Check all possible backend key variations for career and score
-                    if (userData.testCompleted) {
-                        const matchedCareer = userData.career_title || userData.careerTitle || userData.top_domain || userData.topCareer || "Career Guidance Unlocked";
-                        const matchScore = userData.compatibility || userData.matchScore || userData.compatibilityScore || 0;
-
-                        if (userCareerMatchElement) {
-                            userCareerMatchElement.textContent = matchedCareer;
-                        }
-                        if (userMatchScoreElement) {
-                            userMatchScoreElement.textContent = matchScore > 0 ? `${matchScore}% Match Score` : "Completed";
-                        }
-                    } else {
-                        if (userCareerMatchElement) userCareerMatchElement.textContent = "Pending Test";
-                        if (userMatchScoreElement) userMatchScoreElement.textContent = "-- % Match Score";
-                    }
+                if (userTestStatusElement) {
+                    userTestStatusElement.textContent = userData.testCompleted ? "Completed" : "Pending";
                 }
-            } catch (err) {
-                console.error("Error retrieving user Firestore details:", err);
+
+                if (userData.testCompleted) {
+                    const matchedCareer = userData.career_title || userData.top_domain || "Career Guidance Unlocked";
+                    const matchScore = userData.compatibility || 0;
+
+                    if (userCareerMatchElement) {
+                        userCareerMatchElement.textContent = matchedCareer;
+                    }
+                    if (userMatchScoreElement) {
+                        userMatchScoreElement.textContent = matchScore > 0 ? `${matchScore}% Match Score` : "Completed";
+                    }
+                } else {
+                    if (userCareerMatchElement) userCareerMatchElement.textContent = "Pending Test";
+                    if (userMatchScoreElement) userMatchScoreElement.textContent = "-- % Match Score";
+                }
             }
-        } else {
-            window.location.href = "/auth";
+        } catch (err) {
+            console.error("Error retrieving user Firestore details:", err);
         }
     });
-</script>
+    </script>
 </body>
 </html>

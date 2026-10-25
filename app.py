@@ -62,7 +62,6 @@ def api_login():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         email = decoded_token.get('email', '')
-        name = decoded_token.get('name', email.split('@')[0])
         
         admin_emails = [
             "anushkaagre7@gmail.com",
@@ -77,9 +76,9 @@ def api_login():
         if not user_doc.exists:
             user_ref.set({
                 "email": email,
-                "full_name": name if name != email.split('@')[0] else "Anushka",
-                "stream": "Information Technology / Engineering",
-                "academicLevel": "Undergraduate",
+                "full_name": decoded_token.get('name', 'Student'),
+                "stream": "General",
+                "academicLevel": "Standard Track",
                 "testCompleted": False,
                 "createdAt": firestore.SERVER_TIMESTAMP
             }, merge=True)
@@ -187,11 +186,12 @@ def get_user_dashboard_data():
         doc = db.collection('users').document(uid).get()
         if doc.exists:
             data = doc.to_dict()
+            registered_name = data.get('full_name') or 'Student'
             # Return both formats so frontend JS never misses a field
             response_data = {
-                "full_name": data.get('full_name', 'Student'),
+                "full_name": registered_name,
                 "email": data.get('email', ''),
-                "stream": data.get('stream', 'Engineering'),
+                "stream": data.get('stream', 'General'),
                 "testCompleted": data.get('testCompleted', False),
                 "top_domain": data.get('top_domain', 'Pending Assessment'),
                 "career_title": data.get('career_title', 'Complete Test to Unlock'),
@@ -200,7 +200,7 @@ def get_user_dashboard_data():
             }
             return jsonify({"status": "success", "data": response_data})
         else:
-            return jsonify({"status": "success", "data": {"testCompleted": False}})
+            return jsonify({"status": "success", "data": {"testCompleted": False, "full_name": "Student"}})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
         
@@ -344,7 +344,45 @@ def api_admin_update_career(career_id):
         return jsonify({"status": "success", "message": "Career updated successfully."})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+# ----------------------------------------------------
+# STUDENT RESULTS API (Reads completed results from 'users')
+# ----------------------------------------------------
+@app.route('/api/admin/results', methods=['GET'])
+@admin_required
+def api_admin_results():
+    try:
+        results = []
+        # Fetch all user documents from Firestore
+        users_ref = db.collection('users').stream()
+        
+        for doc in users_ref:
+            u = doc.to_dict()
+            
+            # Only include students who have completed their test
+            if u.get('testCompleted') is True:
+                # Format timestamp safely
+                updated_at = u.get('updatedAt') or u.get('createdAt')
+                if hasattr(updated_at, 'strftime'):
+                    formatted_date = updated_at.strftime('%b %d, %Y')
+                elif isinstance(updated_at, str):
+                    formatted_date = updated_at[:10]
+                else:
+                    formatted_date = 'Recent'
 
+                results.append({
+                    "id": doc.id,
+                    "studentName": u.get('full_name') or u.get('name') or (u.get('email', '').split('@')[0] if u.get('email') else 'Student'),
+                    "studentEmail": u.get('email', ''),
+                    "dominantDomain": u.get('top_domain', 'N/A'),
+                    "topCareer": u.get('career_title', 'General Pathway'),
+                    "matchScore": u.get('compatibility', 85),
+                    "formattedDate": formatted_date
+                })
+
+        return jsonify({"status": "success", "results": results})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
 # ----------------------------------------------------
 # HELPER FOR AUTH TOKENS
 # ----------------------------------------------------
@@ -384,7 +422,6 @@ def get_student_questions():
 # ----------------------------------------------------
 # MULTI-CRITERIA QUIZ SUBMISSION API (Uses scoring_engine.py)
 # ----------------------------------------------------
-
 @app.route('/api/quiz/submit', methods=['POST'])
 def submit_quiz():
     uid = get_request_uid()
@@ -401,7 +438,17 @@ def submit_quiz():
         marks_10th = float(user_profile.get('marks_10th', 85.0))
         marks_12th = float(user_profile.get('marks_12th', 80.0))
         
-        evaluation = evaluate_psychometric_profile(answers_traits, marks_10th, marks_12th)
+        # 1. Fetch dynamic careers from Firestore
+        careers_docs = db.collection('careers').stream()
+        firestore_careers = [doc.to_dict() for doc in careers_docs]
+
+        # 2. Evaluate profile with dynamic Firestore careers
+        evaluation = evaluate_psychometric_profile(
+            answers_traits, 
+            marks_10th, 
+            marks_12th, 
+            available_careers=firestore_careers
+        )
         
         result_data = {
             "top_domain": evaluation['top_domain'],
@@ -417,7 +464,7 @@ def submit_quiz():
         return jsonify({"status": "success", "redirect": "/user/results"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
+    
 @app.route('/api/user/results-data', methods=['GET'])
 def get_user_results():
     uid = get_request_uid()
